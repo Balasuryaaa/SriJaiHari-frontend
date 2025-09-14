@@ -34,11 +34,18 @@
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13",
+    "terser": "^5.44.0",
     "vite": "^7.1.2"
   },
   "description": "SRI JAI HARI Engineering Solutions - Frontend Application",
   "main": "eslint.config.js",
-  "keywords": ["engineering", "pulverizer", "machinery", "react", "vite"],
+  "keywords": [
+    "engineering",
+    "pulverizer",
+    "machinery",
+    "react",
+    "vite"
+  ],
   "author": "SRI JAI HARI Engineering Solutions",
   "license": "ISC",
   "engines": {
