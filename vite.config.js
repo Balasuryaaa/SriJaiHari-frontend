@@ -1,22 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwind from '@tailwindcss/vite'
-import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwind()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'), // cleaner imports
-    },
-  },
+  base: '/',
   build: {
     outDir: 'dist',
     sourcemap: false,
     minify: 'esbuild',
-    assetsInlineLimit: 4096, // inline small assets (<4kb)
-    cssCodeSplit: true, // split CSS by chunk
+    assetsInlineLimit: 4096,
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -25,9 +20,16 @@ export default defineConfig({
           ui: ['framer-motion'],
           utils: ['axios', 'zustand', 'react-hook-form', 'react-hot-toast'],
         },
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
     chunkSizeWarningLimit: 1000,
+    target: 'esnext',
+    modulePreload: {
+      polyfill: false,
+    },
   },
   server: {
     port: 3000,

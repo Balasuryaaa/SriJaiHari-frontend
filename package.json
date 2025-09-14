@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "vite preview --port 3000"
   },
@@ -38,7 +38,7 @@
     "vite": "^7.1.2"
   },
   "description": "SRI JAI HARI Engineering Solutions - Frontend Application",
-  "main": "eslint.config.js",
+  "main": "index.html",
   "keywords": [
     "engineering",
     "pulverizer",
