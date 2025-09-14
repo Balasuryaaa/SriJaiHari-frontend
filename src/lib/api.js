@@ -1,42 +1,15 @@
 import axios from 'axios'
 import useAuthStore from '../stores/authStore'
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sri-jai-hari-backend.vercel.app'
+export const BASE_URL = 'https://sri-jai-hari-backend.vercel.app'
 
-const api = axios.create({ 
-	baseURL: BASE_URL,
-	timeout: 10000,
-	headers: {
-		'Content-Type': 'application/json',
-	},
+const api = axios.create({ baseURL: BASE_URL })
+
+api.interceptors.request.use((config) => {
+	const { token } = useAuthStore.getState()
+	if (token) config.headers.Authorization = `Bearer ${token}`
+	return config
 })
-
-// Request interceptor
-api.interceptors.request.use(
-	(config) => {
-		const { token } = useAuthStore.getState()
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`
-		}
-		return config
-	},
-	(error) => {
-		return Promise.reject(error)
-	}
-)
-
-// Response interceptor
-api.interceptors.response.use(
-	(response) => response,
-	(error) => {
-		if (error.response?.status === 401) {
-			// Clear token on unauthorized
-			useAuthStore.getState().setToken(null)
-			window.location.href = '/admin/login'
-		}
-		return Promise.reject(error)
-	}
-)
 
 // Health
 export const healthCheck = () => api.get('/health')

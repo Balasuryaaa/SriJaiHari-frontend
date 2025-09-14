@@ -51,7 +51,7 @@ function Footer() {
 					<div className="text-center md:text-left">
 						<h3 className="font-sans font-semibold text-white mb-4">Contact</h3>
 						<div className="space-y-3 text-gray-300 text-sm">
-							<p>📧 jaiharienggsolutions@gmail.com</p>
+							<p>📧 info@srijaihari.com</p>
 							<div className="space-y-1">
 								<p>📞 +91 9514111460</p>
 								<p>📞 +91 9842211460</p>
