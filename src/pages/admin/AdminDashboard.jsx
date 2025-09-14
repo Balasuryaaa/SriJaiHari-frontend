@@ -7,6 +7,7 @@ import Loader from '../../components/Loader'
 function AdminDashboard() {
 	const [products, setProducts] = useState([])
 	const [loading, setLoading] = useState(true)
+	const [creating, setCreating] = useState(false) // New state for create operation
 	const [name, setName] = useState('')
 	const [details, setDetails] = useState('')
 	const [mediaFiles, setMediaFiles] = useState([]) // images + videos
@@ -57,6 +58,27 @@ function AdminDashboard() {
 	}
 
 	const onCreate = async () => {
+		// Validate required fields
+		if (!name.trim()) {
+			console.warn('Form validation failed: Product name required')
+			toast.error('Product name is required')
+			return
+		}
+		if (!details.trim()) {
+			console.warn('Form validation failed: Product details required')
+			toast.error('Product details are required')
+			return
+		}
+
+		setCreating(true)
+		console.log('Creating new product', { 
+			name, 
+			detailsLength: details.length,
+			mediaCount: mediaFiles.length,
+			imageCount: mediaFiles.filter(f => f.type.startsWith('image/')).length,
+			videoCount: mediaFiles.filter(f => f.type.startsWith('video/')).length
+		})
+
 		try {
 			const fd = new FormData()
 			fd.append('name', name)
@@ -65,12 +87,27 @@ function AdminDashboard() {
 				if (f.type.startsWith('image/')) fd.append('images', f)
 				else if (f.type.startsWith('video/')) fd.append('videos', f)
 			})
+			
 			await createProduct(fd)
-			toast.success('Product created')
-			setName(''); setDetails(''); setMediaFiles([])
+			
+			console.log('Product created successfully', { 
+				productName: name,
+				mediaCount: mediaFiles.length 
+			})
+			
+			toast.success('Product created successfully!')
+			setName('')
+			setDetails('')
+			setMediaFiles([])
 			load()
-		} catch {
-			toast.error('Create failed')
+		} catch (error) {
+			console.error('Failed to create product', { 
+				productName: name,
+				error: error.message 
+			}, error)
+			toast.error('Failed to create product. Please try again.')
+		} finally {
+			setCreating(false)
 		}
 	}
 
@@ -140,7 +177,18 @@ function AdminDashboard() {
 			</div>
 
 			{/* Create Product Section */}
-			<div className="card-engineering mb-8">
+			<div className="card-engineering mb-8 relative">
+				{creating && (
+					<div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+						<div className="text-center">
+							<svg className="w-12 h-12 animate-spin text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+							</svg>
+							<h3 className="text-xl font-semibold text-dark dark:text-white mb-2">Creating Product...</h3>
+							<p className="text-gray-600 dark:text-gray-300">Please wait while we process your request</p>
+						</div>
+					</div>
+				)}
 				<div className="flex items-center gap-3 mb-6">
 					<svg className="gear-icon" fill="currentColor" viewBox="0 0 24 24">
 						<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
@@ -157,6 +205,7 @@ function AdminDashboard() {
 								placeholder="Rajeswari Bullet Plate Mill" 
 								className="w-full rounded-lg border-2 bg-white px-4 py-3 font-sans focus:border-primary focus:ring-2 focus:ring-primary-light transition-all duration-200 text-black" 
 								style={{borderColor: 'var(--color-accent-light)'}}
+								disabled={creating}
 							/>
 						</label>
 						<label className="block">
@@ -167,6 +216,7 @@ function AdminDashboard() {
 								placeholder="Short description" 
 								className="w-full rounded-lg border-2 bg-white px-4 py-3 font-sans focus:border-primary focus:ring-2 focus:ring-primary-light transition-all duration-200 text-black" 
 								style={{borderColor: 'var(--color-accent-light)'}}
+								disabled={creating}
 							/>
 						</label>
 					</div>
@@ -175,17 +225,19 @@ function AdminDashboard() {
 						<span className="font-sans font-semibold text-dark mb-2 block">Media Files (Images & Videos)</span>
 						<div 
 							className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
-								isDragOver 
+								isDragOver && !creating
 									? 'border-primary scale-105' 
+									: creating
+									? 'opacity-50 cursor-not-allowed'
 									: 'hover:border-primary'
 							}`}
 							style={{
-								borderColor: isDragOver ? 'var(--color-primary)' : 'var(--color-accent)',
-								backgroundColor: isDragOver ? 'rgba(254, 226, 226, 0.2)' : 'transparent'
+								borderColor: isDragOver && !creating ? 'var(--color-primary)' : 'var(--color-accent)',
+								backgroundColor: isDragOver && !creating ? 'rgba(254, 226, 226, 0.2)' : 'transparent'
 							}}
-							onDragOver={onDragOver}
-							onDragLeave={onDragLeave}
-							onDrop={onDrop}
+							onDragOver={creating ? undefined : onDragOver}
+							onDragLeave={creating ? undefined : onDragLeave}
+							onDrop={creating ? undefined : onDrop}
 						>
 							<div className="flex flex-col items-center gap-4">
 								<div className="w-16 h-16 rounded-full flex items-center justify-center" style={{
@@ -202,6 +254,7 @@ function AdminDashboard() {
 										multiple 
 										onChange={onPickMedia} 
 										className="w-full mb-4" 
+										disabled={creating}
 									/>
 									<p className="text-lg font-medium text-dark mb-2">
 										Drag and drop files here, or click to select
@@ -231,6 +284,7 @@ function AdminDashboard() {
 											type="button" 
 											className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200" 
 											onClick={() => removeMedia(idx)}
+											disabled={creating}
 										>
 											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -246,11 +300,30 @@ function AdminDashboard() {
 					)}
 					
 					<div className="flex justify-center pt-4">
-						<button className="btn text-lg px-8 py-4" onClick={onCreate}>
-							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-							</svg>
-							Create Product
+						<button 
+							className={`btn text-lg px-8 py-4 flex items-center gap-3 transition-all duration-200 ${
+								creating 
+									? 'opacity-75 cursor-not-allowed' 
+									: 'hover:scale-105'
+							}`}
+							onClick={onCreate}
+							disabled={creating}
+						>
+							{creating ? (
+								<>
+									<svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+									Please wait...
+								</>
+							) : (
+								<>
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+									</svg>
+									Create Product
+								</>
+							)}
 						</button>
 					</div>
 				</div>

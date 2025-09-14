@@ -22,22 +22,16 @@ function App() {
             <Route path="/products/:productId" element={<ProductDetails />} />
             <Route path="/enquiry" element={<Enquiry />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/enquiries"
-              element={
-                <ProtectedRoute>
-                  <EnquiriesAdmin />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/enquiries" element={
+              <ProtectedRoute>
+                <EnquiriesAdmin />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

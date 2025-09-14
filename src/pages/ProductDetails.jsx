@@ -15,34 +15,92 @@ function ProductDetails() {
 	const timerRef = useRef(null)
 
 	useEffect(() => {
+		console.log('ProductDetails component mounted', { productId })
+		
+		if (!productId) {
+			console.error('ProductDetails: No productId provided', { productId })
+			setError('Invalid product ID')
+			setLoading(false)
+			return
+		}
+
 		getProduct(productId)
-			.then((res) => setProduct(res.data))
-			.catch(() => setError('Failed to load product'))
-			.finally(() => setLoading(false))
+			.then((res) => {
+				console.log('Product loaded successfully', { 
+					productId, 
+					productName: res.data?.name,
+					hasImages: !!res.data?.images?.length,
+					hasVideos: !!res.data?.videos?.length
+				})
+				setProduct(res.data)
+			})
+			.catch((err) => {
+				console.error('Failed to load product', { productId }, err)
+				setError('Failed to load product')
+			})
+			.finally(() => {
+				setLoading(false)
+			})
 	}, [productId])
 
 	const media = useMemo(() => {
 		if (!product) return []
 		const imgs = product.images || []
 		const vids = product.videos || []
-		return [...imgs.map((src) => ({ type: 'image', src })), ...vids.map((src) => ({ type: 'video', src }))]
+		const mediaArray = [...imgs.map((src) => ({ type: 'image', src })), ...vids.map((src) => ({ type: 'video', src }))]
+		
+		console.log('Media processed', { 
+			imageCount: imgs.length, 
+			videoCount: vids.length,
+			totalMedia: mediaArray.length 
+		})
+		
+		return mediaArray
 	}, [product])
 
 	useEffect(() => {
 		if (!media.length) return
+		
+		console.log('Starting media carousel timer', { 
+			mediaCount: media.length,
+			interval: '10 seconds'
+		})
+		
 		clearInterval(timerRef.current)
 		timerRef.current = setInterval(() => {
-			setActive((i) => (i + 1) % media.length)
-		}, 6000)
-		return () => clearInterval(timerRef.current)
+			setActive((i) => {
+				const nextIndex = (i + 1) % media.length
+				console.log('Media carousel advanced', { 
+					from: i, 
+					to: nextIndex,
+					mediaType: media[nextIndex]?.type,
+					interval: '10 seconds'
+				})
+				return nextIndex
+			})
+		}, 10000) // Changed from 6000ms (6 seconds) to 10000ms (10 seconds)
+		
+		return () => {
+			clearInterval(timerRef.current)
+			console.log('Media carousel timer cleared')
+		}
 	}, [media.length])
 
 	const openModal = (index) => {
+		console.log('Image modal opened', { 
+			index, 
+			mediaType: media[index]?.type,
+			mediaSrc: media[index]?.src 
+		})
 		setModalIndex(index)
 		setIsModalOpen(true)
 	}
 
 	const closeModal = () => {
+		console.log('Image modal closed', { 
+			wasOpen: isModalOpen,
+			lastIndex: modalIndex 
+		})
 		setIsModalOpen(false)
 	}
 
@@ -122,6 +180,11 @@ function ProductDetails() {
 												src={m.src} 
 												className="h-full w-full object-cover cursor-pointer" 
 												onClick={() => {
+													console.log('Thumbnail clicked', { 
+														index: idx, 
+														mediaType: m.type,
+														wasActive: idx === active 
+													})
 													setActive(idx)
 													openModal(idx)
 												}}
@@ -132,6 +195,11 @@ function ProductDetails() {
 												className="h-full w-full object-cover cursor-pointer" 
 												muted 
 												onClick={() => {
+													console.log('Thumbnail clicked', { 
+														index: idx, 
+														mediaType: m.type,
+														wasActive: idx === active 
+													})
 													setActive(idx)
 													openModal(idx)
 												}}

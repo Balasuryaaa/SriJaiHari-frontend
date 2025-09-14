@@ -231,12 +231,26 @@ input::placeholder, textarea::placeholder {
   color: #6b7280 !important;
 }
 
-/* Dark mode input styling */
-.dark input, .dark textarea, .dark select {
-  color: black !important;
-  background-color: white !important;
+/* Product card hover effects */
+.card-engineering {
+  transition: all 0.3s ease;
 }
 
-.dark input::placeholder, .dark textarea::placeholder {
-  color: #6b7280 !important;
+.card-engineering:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.card-engineering:active {
+  transform: translateY(-4px);
+}
+
+/* Ensure all text inside clickable cards is selectable */
+.card-engineering h3,
+.card-engineering p,
+.card-engineering span {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }

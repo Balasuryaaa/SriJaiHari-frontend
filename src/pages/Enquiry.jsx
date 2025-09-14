@@ -3,16 +3,33 @@ import { submitEnquiry } from '../lib/api'
 import toast from 'react-hot-toast'
 
 function Enquiry() {
-	const { register, handleSubmit, reset } = useForm()
+	const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
 	const onSubmit = async (data) => {
 		try {
+			console.log('Enquiry form submitted', { 
+				name: data.name, 
+				email: data.email,
+				messageLength: data.message?.length || 0 
+			})
+			
 			await submitEnquiry(data)
 			toast.success('Enquiry submitted')
 			reset()
+			
+			console.log('Enquiry submitted successfully')
 		} catch (e) {
+			console.error('Failed to submit enquiry', { 
+				error: e.message,
+				formData: { name: data.name, email: data.email } 
+			}, e)
 			toast.error('Failed to submit enquiry')
 		}
+	}
+
+	// Log form validation errors
+	if (Object.keys(errors).length > 0) {
+		console.warn('Form validation errors', { form: 'enquiry', errors })
 	}
 
 	return (

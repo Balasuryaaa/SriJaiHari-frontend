@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getProducts } from '../lib/api'
 import Loader from '../components/Loader'
 import { motion } from 'framer-motion'
@@ -8,12 +8,32 @@ function Home() {
 	const [products, setProducts] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState('')
+	const navigate = useNavigate()
+
 	useEffect(() => {
+		console.log('Home component mounted')
+		
 		getProducts()
-			.then((res) => setProducts(res.data))
-			.catch(() => setError('Failed to load products'))
+			.then((res) => {
+				console.log('Products loaded successfully', { 
+					productCount: res.data?.length || 0 
+				})
+				setProducts(res.data)
+			})
+			.catch((err) => {
+				console.error('Failed to load products', err)
+				setError('Failed to load products')
+			})
 			.finally(() => setLoading(false))
 	}, [])
+
+	const handleProductClick = (productId, productName) => {
+		console.log('Product card clicked', { 
+			productId, 
+			productName 
+		})
+		navigate(`/products/${productId}`)
+	}
 
 	if (loading) return <Loader />
 	if (error) return <div className="container-page">{error}</div>
@@ -56,16 +76,22 @@ function Home() {
 				variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
 			>
 				{products.map((p) => (
-					<motion.div key={p._id || p.id}
+					<motion.div 
+						key={p._id || p.id}
 						variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
 						whileHover={{ y: -8, scale: 1.02 }}
 						transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-						className="card-engineering group"
+						className="card-engineering group cursor-pointer"
+						onClick={() => handleProductClick(p._id || p.id, p.name)}
 					>
-						<div className="relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-[--color-secondary-light] to-[--color-primary-light] mb-4"
-						>
+						{/* Product Image */}
+						<div className="relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-[--color-secondary-light] to-[--color-primary-light] mb-4">
 							{p.images?.[0] ? (
-								<img src={p.images[0]} alt={p.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+								<img 
+									src={p.images[0]} 
+									alt={p.name} 
+									className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" 
+								/>
 							) : (
 								<div className="h-full w-full grid place-items-center text-accent">
 									<div className="text-center">
@@ -77,16 +103,29 @@ function Home() {
 								</div>
 							)}
 							<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/20" />
+							
+							{/* Hover overlay with click indicator */}
+							<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+								<div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 text-white">
+									<span className="text-sm font-medium">View Details</span>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+									</svg>
+								</div>
+							</div>
 						</div>
+
+						{/* Product Content */}
 						<div className="space-y-3">
-							<Link to={`/products/${p._id || p.id}`} className="block group">
+							<div className="group">
 								<h3 className="font-sans font-bold text-lg text-dark group-hover:text-primary transition-colors">
 									{p.name}
 								</h3>
 								<p className="text-sm text-gray-600 line-clamp-2 mt-2 leading-relaxed">
 									{p.details}
 								</p>
-							</Link>
+							</div>
+							
 							<div className="flex items-center justify-between pt-2">
 								<div className="flex items-center gap-2">
 									<div className="w-2 h-2 bg-primary rounded-full"></div>
