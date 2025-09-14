@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #DC2626;
+  --color-primary-dark: #B91C1C;
+  --color-primary-light: #FEE2E2;
+  --color-secondary: #2563EB;
+  --color-secondary-dark: #1D4ED8;
+  --color-secondary-light: #DBEAFE;
+  --color-accent: #9CA3AF;
+  --color-accent-dark: #6B7280;
+  --color-accent-light: #F3F4F6;
+  --color-dark: #000000;
+  --color-text: #1F2937;
+  --color-text-light: #6B7280;
+  
+  --font-family-display: 'Playfair Display', serif;
+  --font-family-sans: 'Inter', sans-serif;
+  
+  --animate-slide-in-from-bottom: slide-in-from-bottom 0.3s ease-out;
+  --box-shadow-3xl: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Typography - now handled by Tailwind config */
+
+/* Dark mode text colors */
+.dark .text-dark {
+  @apply text-white;
+}
+
+.dark .text-gray-800 {
+  @apply text-white;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-600 {
+  @apply text-gray-400;
+}
+
+/* Buttons */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold shadow-lg focus-visible:outline-none disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-xl;
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn:focus-visible {
+  ring-color: var(--color-primary-light);
+  ring-width: 2px;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold shadow-lg focus-visible:outline-none disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-xl;
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-dark);
+}
+
+.btn-secondary:focus-visible {
+  ring-color: var(--color-secondary-light);
+  ring-width: 2px;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 bg-transparent px-6 py-3 font-semibold focus-visible:outline-none disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-outline:focus-visible {
+  ring-color: var(--color-primary-light);
+  ring-width: 2px;
+}
+
+/* Cards */
+.card {
+  @apply rounded-2xl border bg-white dark:bg-gray-800 shadow-lg backdrop-blur p-6 hover:shadow-xl transition-all duration-300;
+  border-color: var(--color-accent-light);
+}
+
+.dark .card {
+  border-color: var(--color-accent-dark);
+}
+
+.card-engineering {
+  @apply rounded-2xl border-2 shadow-lg backdrop-blur p-6 hover:shadow-xl transition-all duration-300;
+  border-color: var(--color-accent);
+  background: linear-gradient(to bottom right, white, var(--color-accent-light));
+}
+
+.dark .card-engineering {
+  background: linear-gradient(to bottom right, #1f2937, #374151);
+}
+
+/* Layout */
+.container-page {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.app-gradient {
+  @apply bg-gradient-to-br from-white via-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700;
+  background-image: linear-gradient(to bottom right, white, #f9fafb, var(--color-accent-light));
+}
+
+.dark .app-gradient {
+  background-image: linear-gradient(to bottom right, #111827, #1f2937, #374151);
+}
+
+.navbar {
+  @apply border-b-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg;
+  border-color: var(--color-accent);
+}
+
+/* Engineering Theme Elements */
+.gear-icon {
+  @apply w-5 h-5 transition-transform duration-300 hover:rotate-12;
+  color: var(--color-accent);
+}
+
+.engineering-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+}
+
+/* Text Styles */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.text-dark {
+  color: var(--color-dark);
+}
+
+/* Logo Styles */
+.logo-text {
+  @apply font-bold text-2xl;
+  font-family: var(--font-family-display);
+}
+
+.logo-subtitle {
+  @apply text-sm font-medium uppercase tracking-wider;
+  font-family: var(--font-family-sans);
+  color: var(--color-accent);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Floating Info Animations */
+.animate-in {
+  animation: var(--animate-slide-in-from-bottom);
+}
+
+.slide-in-from-bottom-2 {
+  animation: var(--animate-slide-in-from-bottom);
+}
+
+/* Shadow utilities - now handled by Tailwind config */
+
+/* Dark mode hover effects */
+.hover-accent-light:hover {
+  background-color: var(--color-accent-light);
+}
+
+.dark .hover-accent-light:hover {
+  background-color: #374151;
+}
+
+/* Navbar dark mode support */
+.dark .navbar {
+  background-color: rgba(17, 24, 39, 0.95);
+  border-color: var(--color-accent-dark);
+}
+
+/* Footer dark mode support */
+.dark .footer {
+  background: linear-gradient(to right, #111827, #1f2937);
+  border-color: var(--color-accent-dark);
+}
+
+/* Ensure all input and textarea text is black for visibility */
+input, textarea, select {
+  color: black !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Dark mode input styling */
+.dark input, .dark textarea, .dark select {
+  color: black !important;
+  background-color: white !important;
+}
+
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #6b7280 !important;
+}
