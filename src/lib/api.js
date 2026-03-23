@@ -1,10 +1,11 @@
 import axios from 'axios'
 import useAuthStore from '../stores/authStore'
 
-export const BASE_URL = import.meta.env.VITE_API_URL 
-  || (import.meta.env.DEV ? 'http://localhost:8070' : 'https://sri-jai-hari-backend.vercel.app');
+export const BASE_URL = 'https://sri-jai-hari-backend.vercel.app/';
 
-const api = axios.create({ 
+console.log('[API] Targeting:', BASE_URL);
+
+const api = axios.create({
 	baseURL: BASE_URL,
 	timeout: 10000 // 10 second timeout
 })
@@ -16,14 +17,14 @@ api.interceptors.request.use(
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`
 		}
-		
+
 		// Log API request
 		console.log('API Request', {
 			method: config.method?.toUpperCase() || 'UNKNOWN',
 			url: config.url || 'UNKNOWN',
 			data: config.data
 		})
-		
+
 		return config
 	},
 	(error) => {
@@ -50,7 +51,7 @@ api.interceptors.response.use(
 	(error) => {
 		const status = error.response?.status || 'NETWORK_ERROR'
 		const message = error.response?.data?.message || error.message || 'Unknown error'
-		
+
 		// Log API error response
 		console.error('API Error Response', {
 			method: error.config?.method?.toUpperCase() || 'UNKNOWN',
@@ -96,7 +97,7 @@ export const adminLogin = async (payload) => {
 		console.log('Admin login successful', { username: payload.username })
 		return response
 	} catch (error) {
-		console.error('Admin login failed', { 
+		console.error('Admin login failed', {
 			username: payload.username,
 			error: error.response?.data?.message || error.message
 		})
@@ -125,16 +126,16 @@ export const getProduct = async (id) => {
 
 export const createProduct = async (formData) => {
 	try {
-		const response = await api.post('/products', formData, { 
-			headers: { 'Content-Type': 'multipart/form-data' } 
+		const response = await api.post('/products', formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
 		})
-		console.log('Product created successfully', { 
-			productId: response.data?._id || response.data?.id 
+		console.log('Product created successfully', {
+			productId: response.data?._id || response.data?.id
 		})
 		return response
 	} catch (error) {
-		console.error('Failed to create product', { 
-			formData: Object.keys(formData || {}) 
+		console.error('Failed to create product', {
+			formData: Object.keys(formData || {})
 		}, error)
 		throw error
 	}
@@ -166,13 +167,13 @@ export const deleteProduct = async (id) => {
 export const submitEnquiry = async (payload) => {
 	try {
 		const response = await api.post('/enquiries', payload)
-		console.log('Enquiry submitted successfully', { 
-			enquiryId: response.data?._id || response.data?.id 
+		console.log('Enquiry submitted successfully', {
+			enquiryId: response.data?._id || response.data?.id
 		})
 		return response
 	} catch (error) {
-		console.error('Failed to submit enquiry', { 
-			enquiryData: { name: payload.name, email: payload.email } 
+		console.error('Failed to submit enquiry', {
+			enquiryData: { name: payload.name, email: payload.email }
 		}, error)
 		throw error
 	}
@@ -190,9 +191,9 @@ export const listEnquiries = async () => {
 export const updateEnquiry = async (id, payload) => {
 	try {
 		const response = await api.put(`/enquiries/${id}`, payload)
-		console.log('Enquiry updated successfully', { 
-			enquiryId: id, 
-			status: payload.status 
+		console.log('Enquiry updated successfully', {
+			enquiryId: id,
+			status: payload.status
 		})
 		return response
 	} catch (error) {

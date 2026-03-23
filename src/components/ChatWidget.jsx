@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import { useLanguage } from '../context/LanguageContext'
-
-const BACKEND_URL = import.meta.env.DEV ? 'http://localhost:8070' : ''
+import { BASE_URL } from '../lib/api'
 
 function getRoomId() {
   let id = sessionStorage.getItem('chat_room_id')
@@ -37,7 +36,7 @@ export default function ChatWidget({ forcedOpen, onClose }) {
   useEffect(() => {
     if (!nameSubmitted) return
 
-    const socket = io(BACKEND_URL, { transports: ['websocket', 'polling'] })
+    const socket = io(BASE_URL, { transports: ['websocket', 'polling'] })
     socketRef.current = socket
 
     socket.on('connect', () => {

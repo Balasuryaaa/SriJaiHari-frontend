@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
+import { BASE_URL } from '../lib/api'
 
-const BACKEND_URL = import.meta.env.DEV ? 'http://localhost:8070' : ''
 const RED = '#C41E3A'
 const STEEL = '#8C8C8C'
 
@@ -25,7 +25,7 @@ export default function AdminChatPanel() {
 
   // Connect as admin
   useEffect(() => {
-    const socket = io(BACKEND_URL, { transports: ['websocket', 'polling'] })
+    const socket = io(BASE_URL, { transports: ['websocket', 'polling'] })
     socketRef.current = socket
 
     socket.on('connect', () => {
