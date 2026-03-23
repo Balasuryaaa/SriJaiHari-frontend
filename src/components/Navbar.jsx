@@ -49,7 +49,7 @@ function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Nav Actions (Hidden on Mobile) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(1rem, 3vw, 2.5rem)' }} className="hidden-mobile">
           {navLinks.map((link) => (
             <Link 
@@ -70,7 +70,7 @@ function Navbar() {
             </Link>
           ))}
 
-          {/* Language Toggle */}
+          {/* Language Toggle (Desktop Only) */}
           <div style={{ display:'flex', border:`1.5px solid #eee`, borderRadius:10, overflow:'hidden', background:'#f9f9f9' }}>
             <button 
               onClick={() => setLang('en')}
@@ -152,12 +152,6 @@ function Navbar() {
                 {link.label}
               </Link>
             ))}
-            
-            {/* Added Control Room link for Admin access */}
-            <Link to="/admin" onClick={()=>setIsOpen(false)}
-              style={{ textDecoration:'none', color:RED, fontSize:18, fontWeight:900, borderBottom:'1px solid #f0f0f0', paddingBottom:12 }}>
-              ⚙ Control Room
-            </Link>
           </div>
 
           <div style={{ marginTop:'auto', display:'flex', gap:10 }}>

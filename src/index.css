@@ -264,3 +264,13 @@ input::placeholder, textarea::placeholder {
 .dark .card-engineering { background: #1f2937; border-color: #374151; }
 .dark .text-dark { color: #fff; }
 .dark .navbar { background: rgba(26,26,26,0.98); border-color: var(--color-primary); }
+
+/* ── Mobile Display Utilities ────────────────────────────────── */
+@media (max-width: 900px) {
+  .hidden-mobile { display: none !important; }
+  .visible-mobile { display: flex !important; }
+}
+@media (min-width: 901px) {
+  .hidden-mobile { display: flex !important; }
+  .visible-mobile { display: none !important; }
+}
