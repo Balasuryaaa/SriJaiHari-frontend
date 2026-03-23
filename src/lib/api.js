@@ -14,24 +14,17 @@ const api = axios.create({
 api.interceptors.request.use(
 	(config) => {
 		const { token } = useAuthStore.getState()
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`
-		}
-
-		// Log API request
-		console.log('API Request', {
-			method: config.method?.toUpperCase() || 'UNKNOWN',
-			url: config.url || 'UNKNOWN',
-			data: config.data
-		})
-
+		if (token) config.headers.Authorization = `Bearer ${token}`
+		
+		console.group(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+		console.log('Full URL:', config.baseURL + config.url);
+		console.log('Payload:', config.data);
+		console.groupEnd();
+		
 		return config
 	},
 	(error) => {
-		console.error('API Request Error', {
-			message: error.message,
-			config: error.config
-		})
+		console.error('❌ Request Setup Error:', error);
 		return Promise.reject(error)
 	}
 )
@@ -39,41 +32,26 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
 	(response) => {
-		// Log successful API response
-		console.log('API Response', {
-			method: response.config.method?.toUpperCase() || 'UNKNOWN',
-			url: response.config.url || 'UNKNOWN',
-			status: response.status,
-			data: response.data
-		})
+		console.group(`✅ API Success: ${response.config.method?.toUpperCase()} ${response.config.url}`);
+		console.log('Status:', response.status);
+		console.log('Data:', response.data);
+		console.groupEnd();
 		return response
 	},
 	(error) => {
 		const status = error.response?.status || 'NETWORK_ERROR'
 		const message = error.response?.data?.message || error.message || 'Unknown error'
+		
+		console.group(`🛑 API ERROR: ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+		console.error('Status:', status);
+		console.error('Message:', message);
+		console.error('Full Error:', error);
+		console.groupEnd();
 
-		// Log API error response
-		console.error('API Error Response', {
-			method: error.config?.method?.toUpperCase() || 'UNKNOWN',
-			url: error.config?.url || 'UNKNOWN',
-			status,
-			data: error.response?.data,
-			error: error.message
-		})
-
-		// Handle specific error cases
 		if (status === 401) {
-			console.warn('Token expired, redirecting to login')
+			console.warn('AUTH: Token expired or invalid. Redirecting...');
 			useAuthStore.getState().logout()
 			window.location.href = '/admin/login'
-		} else if (status === 403) {
-			console.warn('Access denied', { url: error.config?.url })
-		} else if (status >= 500) {
-			console.error('Server Error', {
-				status,
-				url: error.config?.url,
-				message
-			})
 		}
 
 		return Promise.reject(error)

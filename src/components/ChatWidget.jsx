@@ -36,16 +36,29 @@ export default function ChatWidget({ forcedOpen, onClose }) {
   useEffect(() => {
     if (!nameSubmitted) return
 
+    console.log('🔌 SOCKET: Attempting connection to', BASE_URL);
     const socket = io(BASE_URL, { transports: ['websocket', 'polling'] })
     socketRef.current = socket
 
     socket.on('connect', () => {
+      console.log('✅ SOCKET: Connected! ID:', socket.id);
       setConnected(true)
       socket.emit('user:join', { roomId: roomId.current, userName })
-    })
+    });
 
-    socket.on('disconnect', () => setConnected(false))
-    socket.on('chat:history', (history) => setMessages(history))
+    socket.on('connect_error', (err) => {
+      console.error('❌ SOCKET ERROR:', err.message, err);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.warn('⚠️ SOCKET: Disconnected. Reason:', reason);
+      setConnected(false)
+    });
+    
+    socket.on('chat:history', (history) => {
+      console.log('📚 SOCKET: History received:', history.length, 'messages');
+      setMessages(history);
+    });
     socket.on('chat:message', (msg) => {
       setMessages((prev) => {
         if (prev.find((m) => (m._id || m.id) === (msg._id || msg.id))) return prev
