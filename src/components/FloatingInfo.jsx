@@ -9,7 +9,10 @@ function FloatingInfo() {
   const [isOpen, setIsOpen] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false)
 
-  const toggleChat = () => setIsChatOpen(!isChatOpen)
+  const toggleChat = () => {
+    sessionStorage.setItem('chat_tooltip_hidden', 'true')
+    setIsChatOpen(!isChatOpen)
+  }
 
   return (
     <>
@@ -40,9 +43,11 @@ function FloatingInfo() {
               </motion.div>
               
               {/* Tooltip notice */}
-              <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden md:block">
-                Message Consultant
-              </div>
+              {!sessionStorage.getItem('chat_tooltip_hidden') && (
+                <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden md:block">
+                  Message Consultant
+                </div>
+              )}
             </motion.button>
           )}
         </AnimatePresence>
