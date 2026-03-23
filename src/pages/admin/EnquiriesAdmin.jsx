@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { listEnquiries, updateEnquiry } from '../../lib/api'
 import Loader from '../../components/Loader'
 import useAuthStore from '../../stores/authStore'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const RED = '#C41E3A'
 const STEEL = '#8C8C8C'
@@ -104,9 +105,9 @@ function EnquiriesAdmin() {
 							<option value="resolved">Resolved ({items.filter(i => i.status === 'resolved').length})</option>
 						</select>
 					</div>
-					<button onClick={load} style={{ background:'#fff', border:'1.5px solid #eee', padding:'8px 16px', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+					<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={load} style={{ background:'#fff', border:'1.5px solid #eee', padding:'8px 16px', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>
 						Refresh List
-					</button>
+					</motion.button>
 				</div>
 
 				<div style={{ display:'flex', flexDirection:'column', gap:20 }}>
@@ -114,8 +115,9 @@ function EnquiriesAdmin() {
 						filteredItems.length === 0 ? (
 							<div style={{ textAlign:'center', padding:'60px 0', color:STEEL }}>No enquiries found matching this filter.</div>
 						) : (
-							filteredItems.map(e => (
-								<div key={e._id || e.id} style={{ 
+							<motion.div initial="hidden" animate="show" variants={{ hidden:{}, show:{ transition:{ staggerChildren:0.06 } } }} style={{ display:'flex', flexDirection:'column', gap:20 }}>
+							{filteredItems.map(e => (
+								<motion.div variants={{ hidden:{ opacity:0, y:20 }, show:{ opacity:1, y:0 } }} whileHover={{ scale: 1.01, boxShadow: '0 15px 40px rgba(196,30,58,0.08)' }} key={e._id || e.id} style={{ 
 									background:'#fff', borderRadius:24, padding:25, border: e.status === 'resolved' ? '1.5px solid #eee' : `1.5px solid ${RED}`,
 									boxShadow: e.status === 'resolved' ? 'none' : '0 10px 30px rgba(196,30,58,0.05)', position:'relative'
 								}}>
@@ -136,17 +138,18 @@ function EnquiriesAdmin() {
 
 									<div style={{ display:'flex', justifyContent:'flex-end' }}>
 										{e.status === 'resolved' ? (
-											<button onClick={()=>markPending(e._id || e.id)} style={{ padding:'8px 16px', borderRadius:10, border:'1.5px solid #eee', background:'#fff', fontSize:12, fontWeight:800, cursor:'pointer', color:STEEL }}>
+											<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={()=>markPending(e._id || e.id)} style={{ padding:'8px 16px', borderRadius:10, border:'1.5px solid #eee', background:'#fff', fontSize:12, fontWeight:800, cursor:'pointer', color:STEEL }}>
 												Move to Pending
-											</button>
+											</motion.button>
 										) : (
-											<button onClick={()=>markResolved(e._id || e.id)} style={{ padding:'8px 20px', borderRadius:10, border:'none', background:RED, color:'#fff', fontSize:12, fontWeight:800, cursor:'pointer', boxShadow:`0 4px 12px rgba(196,30,58,0.2)` }}>
+											<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={()=>markResolved(e._id || e.id)} style={{ padding:'8px 20px', borderRadius:10, border:'none', background:RED, color:'#fff', fontSize:12, fontWeight:800, cursor:'pointer', boxShadow:`0 4px 12px rgba(196,30,58,0.2)` }}>
 												Mark Resolved
-											</button>
+											</motion.button>
 										)}
 									</div>
-								</div>
-							))
+								</motion.div>
+							))}
+							</motion.div>
 						)
 					)}
 				</div>

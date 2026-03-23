@@ -60,12 +60,12 @@ function Home() {
 					{/* CTAs */}
 					<motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, delay:0.25 }}
 						style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap', marginBottom:56 }}>
-						<a href="#products" style={{ background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)`, transition:'all 0.2s' }}>
+						<motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="#products" style={{ background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)` }}>
 							{t('hero.browse')}
-						</a>
-						<a href="/enquiry" style={{ background:'rgba(14,165,233,0.18)', color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, border:'1.5px solid rgba(14,165,233,0.5)', transition:'all 0.2s' }}>
+						</motion.a>
+						<motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="/enquiry" style={{ background:'rgba(14,165,233,0.18)', color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, border:'1.5px solid rgba(14,165,233,0.5)' }}>
 							{t('hero.getQuote')}
-						</a>
+						</motion.a>
 					</motion.div>
 
 					{/* Stats */}
@@ -145,9 +145,9 @@ function Home() {
 							{t('home.bulkSub')}
 						</p>
 						<div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
-							<a href="/enquiry" style={{ display:'inline-flex', alignItems:'center', gap:8, background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 28px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)` }}>
+							<motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="/enquiry" style={{ display:'inline-flex', alignItems:'center', gap:8, background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 28px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)` }}>
 								{t('home.sendEnquiry')}
-							</a>
+							</motion.a>
 						</div>
 					</div>
 				</motion.div>
@@ -157,24 +157,26 @@ function Home() {
 }
 
 function ProductCard({ p, onClick }) {
-	const [hovered, setHovered] = useState(false)
 	return (
 		<motion.div
 			variants={{ hidden:{ opacity:0, y:24 }, show:{ opacity:1, y:0 } }}
+			whileHover={{ scale: 1.03, y: -8, boxShadow: `0 20px 40px rgba(196,30,58,0.12)`, borderColor: RED }}
+			whileTap={{ scale: 0.98 }}
 			onClick={onClick}
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
 			style={{
 				background:'#fff', borderRadius:16, overflow:'hidden', cursor:'pointer',
-				border: hovered ? `1.5px solid ${RED}` : '1.5px solid #e8e8e8',
-				boxShadow: hovered ? `0 16px 48px rgba(196,30,58,0.14)` : '0 4px 16px rgba(0,0,0,0.05)',
-				transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
-				transition: 'all 0.28s ease',
+				border: '1.5px solid #e8e8e8',
+				boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
+				transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
 			}}
 		>
 			<div style={{ aspectRatio:'16/10', overflow:'hidden', background:'linear-gradient(135deg, #f0f8ff, #fde8ec)' }}>
 				{p.images?.[0] && (
-					<img src={p.images[0]} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover', transform: hovered ? 'scale(1.07)' : 'scale(1)', transition:'transform 0.4s ease' }} />
+					<motion.img 
+            whileHover={{ scale: 1.08 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            src={p.images[0]} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} 
+          />
 				)}
 			</div>
 			<div style={{ padding:'1.1rem 1.25rem 1.3rem' }}>

@@ -154,27 +154,29 @@ function ProductDetails() {
 
 						{/* Inquiry Actions */}
 						<div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
-							<button 
+							<motion.button 
+								whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
 								onClick={() => navigate('/enquiry')}
 								style={{ 
 									flex:1, minWidth:240, background:RED, color:'#fff', border:'none', borderRadius:14, 
 									padding:'18px 32px', fontWeight:800, fontSize:16, cursor:'pointer',
-									boxShadow:`0 10px 30px rgba(196,30,58,0.35)`, transition:'all 0.2s',
+									boxShadow:`0 10px 30px rgba(196,30,58,0.35)`, transition:'box-shadow 0.2s',
 									display:'flex', alignItems:'center', justifyContent:'center', gap:10
 								}}
 							>
 								{t('product.customQuote')}
-							</button>
-							<a 
+							</motion.button>
+							<motion.a 
+								whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
 								href="tel:+919514111460"
 								style={{ 
 									background:'rgba(14,165,233,0.1)', color:CYAN, textDecoration:'none', borderRadius:14, 
 									padding:'18px 24px', fontWeight:800, border:`1.5px solid ${CYAN}`,
-									transition:'all 0.2s', display:'flex', alignItems:'center', gap:10
+									display:'flex', alignItems:'center', gap:10
 								}}
 							>
 								<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-							</a>
+							</motion.a>
 						</div>
 
 						<div style={{ marginTop:30, display:'flex', alignItems:'center', gap:10, color:STEEL, fontSize:12 }}>

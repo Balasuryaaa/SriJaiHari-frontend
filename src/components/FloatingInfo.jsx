@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ChatWidget from './ChatWidget'
 
@@ -8,56 +8,82 @@ const CYAN  = '#0EA5E9'
 function FloatingInfo() {
   const [isOpen, setIsOpen] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false)
+  
+  const [hasOpenedOnce, setHasOpenedOnce] = useState(!!sessionStorage.getItem('chat_tooltip_hidden'))
 
   const toggleChat = () => {
-    sessionStorage.setItem('chat_tooltip_hidden', 'true')
-    setIsChatOpen(!isChatOpen)
+    setIsChatOpen(true)
+  }
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false)
+    if (!hasOpenedOnce) {
+      sessionStorage.setItem('chat_tooltip_hidden', 'true')
+      // Allow the standalone button to fade back in cleanly so the user SEES the migration animation
+      setTimeout(() => setHasOpenedOnce(true), 500)
+    }
   }
 
   return (
     <>
-      {/* ── Separate High-Visibility Chat Button ── */}
-      <div className="fixed right-5 bottom-24 md:bottom-[100px]" style={{ zIndex: 9999 }}>
-        <AnimatePresence>
-          {!isChatOpen && (
-            <motion.button 
-              onClick={toggleChat}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              style={{
-                width: 'clamp(55px, 12vw, 70px)', height: 'clamp(55px, 12vw, 70px)', borderRadius: '50%', background: CYAN,
-                border: '3px solid #fff', color: '#fff', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: `0 12px 30px rgba(14,165,233,0.4)`
-              }}
-            >
-              <motion.div
-                animate={{ scale: [1, 1.12, 1] }}
-                transition={{ repeat: Infinity, duration: 2.5 }}
-              >
-                <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-                </svg>
-              </motion.div>
-              
-              {/* Tooltip notice */}
-              {!sessionStorage.getItem('chat_tooltip_hidden') && (
-                <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden md:block">
-                  Message Consultant
-                </div>
+      {/* ── Separate High-Visibility Chat Button (Vanishes after first click) ── */}
+      <AnimatePresence>
+        {!hasOpenedOnce && (
+          <motion.div 
+            className="fixed right-5 bottom-24 md:bottom-[100px]" 
+            style={{ zIndex: 9999 }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, y: 70, scale: 0.1, transition: { duration: 0.6, ease: "easeInOut" } }} // "Sucked into +" animation
+          >
+            <AnimatePresence>
+              {!isChatOpen && (
+                <motion.button 
+                  onClick={toggleChat}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  style={{
+                    width: 'clamp(55px, 12vw, 70px)', height: 'clamp(55px, 12vw, 70px)', borderRadius: '50%', background: CYAN,
+                    border: '3px solid #fff', color: '#fff', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: `0 12px 30px rgba(14,165,233,0.4)`
+                  }}
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.12, 1] }}
+                    transition={{ repeat: Infinity, duration: 2.5 }}
+                  >
+                    <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                    </svg>
+                  </motion.div>
+                  
+                  {/* Tooltip notice */}
+                  <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden md:block">
+                    Message Consultant
+                  </div>
+                </motion.button>
               )}
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Contact Menu Toggle ── */}
       <div style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 998 }}>
         <AnimatePresence>
           {isOpen && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 8 }}>
+              {/* Chat option appears here ONLY after standalone bubble is sucked in */}
+              {hasOpenedOnce && (
+                <motion.button 
+                  onClick={() => { setIsChatOpen(true); setIsOpen(false); }}
+                  initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:10 }}
+                  style={{ width:50, height:50, borderRadius:'50%', background:CYAN, border:`2px solid #fff`, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', cursor:'pointer', boxShadow:`0 4px 10px rgba(0,0,0,0.1)` }}
+                >
+                  <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" /></svg>
+                </motion.button>
+              )}
               <motion.a 
                 href="tel:+919514111460" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:10 }}
                 style={{ width:50, height:50, borderRadius:'50%', background:'#fff', border:`2px solid #22c55e`, display:'flex', alignItems:'center', justifyContent:'center', color:'#22c55e', textDecoration:'none' }}>
@@ -82,7 +108,7 @@ function FloatingInfo() {
         </button>
       </div>
 
-      <ChatWidget forcedOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      <ChatWidget forcedOpen={isChatOpen} onClose={handleCloseChat} />
     </>
   )
 }
