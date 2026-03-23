@@ -1,7 +1,7 @@
 import axios from 'axios'
 import useAuthStore from '../stores/authStore'
 
-export const BASE_URL = 'https://sri-jai-hari-backend.vercel.app/';
+export const BASE_URL = 'https://sri-jai-hari-backend.vercel.app'.replace(/\/$/, '');
 
 console.log('[API] Targeting:', BASE_URL);
 
