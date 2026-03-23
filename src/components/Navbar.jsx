@@ -96,7 +96,7 @@ function Navbar() {
             </button>
           </div>
 
-          <a href="tel:+919514111460" style={{
+          <a href="tel:+919514111460" className="hidden-mobile" style={{
             background: RED,
             color: '#fff',
             textDecoration: 'none',
@@ -145,21 +145,29 @@ function Navbar() {
               padding: '100px 30px 40px', display: 'flex', flexDirection: 'column', gap: 20
             }}
           >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {navLinks.map(link => (
               <Link key={link.path} to={link.path} onClick={()=>setIsOpen(false)}
-                style={{ textDecoration:'none', color:'#111', fontSize:20, fontWeight:800, borderBottom:'1px solid #f0f0f0', paddingBottom:10 }}>
+                style={{ textDecoration:'none', color:'#111', fontSize:18, fontWeight:800, borderBottom:'1px solid #f0f0f0', paddingBottom:12 }}>
                 {link.label}
               </Link>
             ))}
+            
+            {/* Added Control Room link for Admin access */}
+            <Link to="/admin" onClick={()=>setIsOpen(false)}
+              style={{ textDecoration:'none', color:RED, fontSize:18, fontWeight:900, borderBottom:'1px solid #f0f0f0', paddingBottom:12 }}>
+              ⚙ Control Room
+            </Link>
+          </div>
 
-            <div style={{ marginTop:'auto', display:'flex', gap:10 }}>
-              <button onClick={()=>setLang('en')} style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${lang==='en'?RED:'#eee'}`, background:lang==='en'?RED:'#fff', color:lang==='en'?'#fff':'#333', fontWeight:800 }}>English</button>
-              <button onClick={()=>setLang('ta')} style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${lang==='ta'?RED:'#eee'}`, background:lang==='ta'?RED:'#fff', color:lang==='ta'?'#fff':'#333', fontWeight:800 }}>தமிழ்</button>
-            </div>
+          <div style={{ marginTop:'auto', display:'flex', gap:10 }}>
+            <button onClick={()=>setLang('en')} style={{ flex:1, padding:14, borderRadius:12, border:`1.5px solid ${lang==='en'?RED:'#eee'}`, background:lang==='en'?RED:'#fff', color:lang==='en'?'#fff':'#333', fontWeight:800, fontSize:12 }}>English</button>
+            <button onClick={()=>setLang('ta')} style={{ flex:1, padding:14, borderRadius:12, border:`1.5px solid ${lang==='ta'?RED:'#eee'}`, background:lang==='ta'?RED:'#fff', color:lang==='ta'?'#fff':'#333', fontWeight:800, fontSize:12 }}>தமிழ்</button>
+          </div>
 
-            <a href="tel:+919514111460" style={{ background:RED, color:'#fff', textDecoration:'none', padding:16, borderRadius:14, textAlign:'center', fontWeight:800, fontSize:16 }}>
-              {t('nav.callNow')}
-            </a>
+          <a href="tel:+919514111460" style={{ background:RED, color:'#fff', textDecoration:'none', padding:18, borderRadius:14, textAlign:'center', fontWeight:800, fontSize:16, boxShadow:'0 10px 20px rgba(196,30,58,0.2)' }}>
+            {t('nav.callNow')}
+          </a>
           </motion.div>
         )}
       </AnimatePresence>

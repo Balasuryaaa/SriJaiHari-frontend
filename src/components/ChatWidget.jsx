@@ -92,21 +92,23 @@ export default function ChatWidget({ forcedOpen, onClose }) {
 
   return (
     <div style={{ 
-      position: 'absolute', right: 0, bottom: 85,
-      width: 320, height: 450, background: '#fff', borderRadius: 24, padding: 0, overflow: 'hidden',
-      display: 'flex', flexDirection: 'column', border: '1px solid #eee', boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+      position: 'fixed', right: 'clamp(10px, 4vw, 20px)', bottom: 'clamp(80px, 15vh, 100px)',
+      width: 'clamp(300px, 90vw, 380px)', height: 'clamp(400px, 60vh, 550px)', 
+      background: '#fff', borderRadius: 24, padding: 0, overflow: 'hidden',
+      display: 'flex', flexDirection: 'column', border: '1px solid #eee', 
+      boxShadow: '0 30px 60px rgba(0,0,0,0.15)', zIndex: 100000
     }}>
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#111', color: '#fff', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#22c55e' : '#ff4b2b' }} />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: 13 }}>SJH Engineering Solution</div>
-              <div style={{ fontSize: 10, opacity: 0.8, fontWeight: 700 }}>Consultant Messaging Service</div>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#22c55e' : '#ff4b2b', boxShadow: connected ? '0 0 8px #22c55e' : 'none' }} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>SJH Engineering Solution</div>
+              <div style={{ fontSize: 9, opacity: 0.8, fontWeight: 700 }}>Online Support Consultant</div>
             </div>
           </div>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+        <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', cursor: 'pointer', padding: 6, borderRadius: 10, display: 'flex' }}>
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 

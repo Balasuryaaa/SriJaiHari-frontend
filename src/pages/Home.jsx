@@ -34,7 +34,7 @@ function Home() {
 			<div style={{
 				background: `linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 55%, #3a0d16 100%)`,
 				position: 'relative', overflow: 'hidden',
-				padding: 'clamp(3rem,8vw,6rem) 1rem clamp(3rem,7vw,5rem)',
+				padding: 'clamp(3rem,8vw,6rem) 1rem clamp(5rem,12vw,8rem)',
 			}}>
 				<div className="container-page" style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
 					{/* Live badge */}
