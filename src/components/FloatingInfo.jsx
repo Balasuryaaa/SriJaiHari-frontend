@@ -20,27 +20,27 @@ function FloatingInfo() {
             <motion.button 
               onClick={toggleChat}
               initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1.1, opacity: 1 }}
-              whileHover={{ scale: 1.25 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               style={{
-                width: 70, height: 70, borderRadius: '50%', background: CYAN,
-                border: '4px solid #fff', color: '#fff', cursor: 'pointer',
+                width: 'clamp(55px, 12vw, 70px)', height: 'clamp(55px, 12vw, 70px)', borderRadius: '50%', background: CYAN,
+                border: '3px solid #fff', color: '#fff', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: `0 12px 30px rgba(14,165,233,0.4)`
               }}
             >
               <motion.div
-                animate={{ scale: [1, 1.15, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+                animate={{ scale: [1, 1.12, 1] }}
+                transition={{ repeat: Infinity, duration: 2.5 }}
               >
-                <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+                <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
                 </svg>
               </motion.div>
               
               {/* Tooltip notice */}
-              <div style={{ position:'absolute', right:80, background:'#111', color:'#fff', padding:'8px 16px', borderRadius:10, fontSize:12, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }}>
+              <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden-mobile">
                 Message Consultant
               </div>
             </motion.button>

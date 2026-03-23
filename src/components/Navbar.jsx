@@ -28,11 +28,17 @@ function Navbar() {
       zIndex: 1000,
       boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
     }}>
-      <div className="container-page" style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="container-page" style={{ 
+        height: 'clamp(60px, 10vh, 80px)', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        padding: '0 1rem'
+      }}>
         
         {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
-          <img src={logo} alt="SRI JAI HARI" style={{ height: 48, width: 'auto' }} />
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', maxWidth: '75%' }}>
+          <img src={logo} alt="SRI JAI HARI" style={{ height: 'clamp(32px, 5vw, 44px)', width: 'auto' }} />
           <div className="hidden-mobile">
             <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 18 }}>
               <span style={{ color: RED }}>SRI JAI HARI</span>

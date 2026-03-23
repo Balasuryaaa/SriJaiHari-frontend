@@ -70,15 +70,21 @@ function Home() {
 
 					{/* Stats */}
 					<motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.8, delay:0.4 }}
-						style={{ display:'flex', justifyContent:'center', gap:'clamp(1.5rem,4vw,4rem)', flexWrap:'wrap', paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.1)', width:'100%' }}>
+						style={{ 
+              display:'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+              gap:'1rem',
+              justifyItems:'center',
+              paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.1)', width:'100%' 
+            }}>
 						{[ 
 							{v:'20+', l: t('hero.years')}, 
 							{v:'All TN', l: t('hero.coverage')}, 
 							{v:'24/7', l: t('hero.support')} 
 						].map(item => (
 							<div key={item.l} style={{ textAlign:'center' }}>
-								<div style={{ color:RED, fontWeight:900, fontSize:'clamp(1.5rem,3vw,2.2rem)', fontFamily:"'Playfair Display',serif" }}>{item.v}</div>
-								<div style={{ color:'rgba(255,255,255,0.5)', fontSize:12, fontWeight:500, marginTop:3, letterSpacing:'0.04em' }}>{item.l}</div>
+								<div style={{ color:RED, fontWeight:900, fontSize:'clamp(1.2rem, 3.5vw, 1.8rem)', fontFamily:"'Playfair Display',serif" }}>{item.v}</div>
+								<div style={{ color:'rgba(255,255,255,0.5)', fontSize:10, fontWeight:600, marginTop:1, textTransform:'uppercase', letterSpacing:'0.03em' }}>{item.l}</div>
 							</div>
 						))}
 					</motion.div>
