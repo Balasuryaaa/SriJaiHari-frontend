@@ -10,17 +10,23 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import FloatingInfo from './components/FloatingInfo'
+import ChatWidget from './components/ChatWidget'
+
+import { LanguageProvider } from './context/LanguageContext'
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-full flex flex-col app-gradient text-dark dark:text-white font-sans bg-white dark:bg-gray-900">
+    <LanguageProvider>
+      <BrowserRouter>
+      <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', background: '#fff' }}>
         <Navbar />
-        <main className="flex-1 py-6">
+        <main style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products/:productId" element={<ProductDetails />} />
             <Route path="/enquiry" element={<Enquiry />} />
+            {/* Secret admin login — not linked anywhere in the UI */}
+            <Route path="/sjh-control-room" element={<AdminLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={
               <ProtectedRoute>
@@ -40,6 +46,7 @@ function App() {
         <Toaster position="top-right" />
       </div>
     </BrowserRouter>
+    </LanguageProvider>
   )
 }
 

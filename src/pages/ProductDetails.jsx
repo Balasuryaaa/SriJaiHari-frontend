@@ -1,268 +1,205 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getProduct } from '../lib/api'
 import Loader from '../components/Loader'
-import ImageModal from '../components/ImageModal'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '../context/LanguageContext'
+
+const RED   = '#C41E3A'
+const CYAN  = '#0EA5E9'
+const STEEL = '#8C8C8C'
 
 function ProductDetails() {
+	const { t } = useLanguage()
 	const { productId } = useParams()
+	const navigate = useNavigate()
 	const [product, setProduct] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState('')
-	const [active, setActive] = useState(0)
-	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [modalIndex, setModalIndex] = useState(0)
-	const timerRef = useRef(null)
+	const [activeImg, setActiveImg] = useState(0)
 
 	useEffect(() => {
-		console.log('ProductDetails component mounted', { productId })
-		
-		if (!productId) {
-			console.error('ProductDetails: No productId provided', { productId })
-			setError('Invalid product ID')
-			setLoading(false)
-			return
-		}
-
+		setLoading(true)
 		getProduct(productId)
-			.then((res) => {
-				console.log('Product loaded successfully', { 
-					productId, 
-					productName: res.data?.name,
-					hasImages: !!res.data?.images?.length,
-					hasVideos: !!res.data?.videos?.length
-				})
-				setProduct(res.data)
-			})
-			.catch((err) => {
-				console.error('Failed to load product', { productId }, err)
-				setError('Failed to load product')
-			})
-			.finally(() => {
-				setLoading(false)
-			})
+			.then((res) => setProduct(res.data))
+			.catch(() => setError('Failed to load product details.'))
+			.finally(() => setLoading(false))
 	}, [productId])
 
-	const media = useMemo(() => {
-		if (!product) return []
-		const imgs = product.images || []
-		const vids = product.videos || []
-		const mediaArray = [...imgs.map((src) => ({ type: 'image', src })), ...vids.map((src) => ({ type: 'video', src }))]
-		
-		console.log('Media processed', { 
-			imageCount: imgs.length, 
-			videoCount: vids.length,
-			totalMedia: mediaArray.length 
-		})
-		
-		return mediaArray
-	}, [product])
-
-	useEffect(() => {
-		if (!media.length) return
-		
-		console.log('Starting media carousel timer', { 
-			mediaCount: media.length,
-			interval: '10 seconds'
-		})
-		
-		clearInterval(timerRef.current)
-		timerRef.current = setInterval(() => {
-			setActive((i) => {
-				const nextIndex = (i + 1) % media.length
-				console.log('Media carousel advanced', { 
-					from: i, 
-					to: nextIndex,
-					mediaType: media[nextIndex]?.type,
-					interval: '10 seconds'
-				})
-				return nextIndex
-			})
-		}, 10000) // Changed from 6000ms (6 seconds) to 10000ms (10 seconds)
-		
-		return () => {
-			clearInterval(timerRef.current)
-			console.log('Media carousel timer cleared')
-		}
-	}, [media.length])
-
-	const openModal = (index) => {
-		console.log('Image modal opened', { 
-			index, 
-			mediaType: media[index]?.type,
-			mediaSrc: media[index]?.src 
-		})
-		setModalIndex(index)
-		setIsModalOpen(true)
-	}
-
-	const closeModal = () => {
-		console.log('Image modal closed', { 
-			wasOpen: isModalOpen,
-			lastIndex: modalIndex 
-		})
-		setIsModalOpen(false)
-	}
-
 	if (loading) return <Loader />
-	if (error) return <div className="container-page">{error}</div>
-	if (!product) return null
+
+	if (error || !product) return (
+		<div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'60vh', flexDirection:'column' }}>
+			<h2 style={{ color:STEEL, marginBottom:20 }}>{error || 'Product not found'}</h2>
+			<button onClick={() => navigate('/')} style={{ background:RED, color:'#fff', border:'none', borderRadius:10, padding:'10px 24px', cursor:'pointer', fontWeight:800 }}>
+				{t('product.back')}
+			</button>
+		</div>
+	)
+
+	const images = product.images || []
 
 	return (
-		<div className="container-page">
-			{/* Hero Section */}
-			<div className="text-center mb-12 py-8">
-				<div className="flex justify-center mb-6">
-					<div className="relative">
-						<div className="w-20 h-20 bg-gradient-to-br from-[--color-primary] to-[--color-secondary] rounded-full flex items-center justify-center shadow-2xl">
-							<svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-								<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-							</svg>
-						</div>
-						<div className="absolute -top-2 -right-2 w-6 h-6 bg-[--color-secondary] rounded-full animate-pulse"></div>
-					</div>
+		<div style={{ background:'#fff', minHeight:'100vh' }}>
+			{/* ── Sub-Header / Breadcrumb ────────────────────────────────────── */}
+			<div style={{ background:'#f8f8f6', borderBottom:'1px solid #e8e8e8', padding:'1rem 0' }}>
+				<div className="container-page" style={{ display:'flex', alignItems:'center', gap:10, fontSize:13, color:STEEL }}>
+					<span onClick={() => navigate('/')} style={{ cursor:'pointer', fontWeight:600 }}>{t('nav.home')}</span>
+					<span style={{ opacity:0.5 }}>/</span>
+					<span style={{ color:RED, fontWeight:800 }}>{product.name}</span>
 				</div>
-				<h1 className="font-display font-bold text-4xl mb-4">
-					<span className="text-primary">Product</span> <span className="text-dark">Details</span>
-				</h1>
 			</div>
 
-			<div className="grid lg:grid-cols-2 gap-12">
-				{/* Media Section */}
-				<div className="space-y-6">
-					<div 
-						className="aspect-video overflow-hidden rounded-2xl bg-gradient-to-br from-[--color-secondary-light] to-[--color-primary-light] grid place-items-center hover:opacity-90 transition-all duration-300 group"
-					>
-						{media.length ? (
-							media[active].type === 'image' ? (
-								<img 
-									src={media[active].src} 
+			<div className="container-page" style={{ padding:'4rem 1rem' }}>
+				<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:'4rem', alignItems:'start' }}>
+					
+					{/* ── Left: Image Gallery ────────────────────────────────────────── */}
+					<div style={{ position:'sticky', top:100 }}>
+						<motion.div 
+							initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
+							style={{ 
+								aspectRatio:'1/1', background:'#f9f9f9', borderRadius:24, overflow:'hidden', 
+								border:'1.5px solid #eee', boxShadow:'0 10px 40px rgba(0,0,0,0.04)',
+								marginBottom:20, position:'relative'
+							}}
+						>
+							<AnimatePresence mode='wait'>
+								<motion.img 
+									key={activeImg}
+									initial={{ opacity:0, scale:0.95 }}
+									animate={{ opacity:1, scale:1 }}
+									exit={{ opacity:0, scale:1.05 }}
+									transition={{ duration:0.3 }}
+									src={images[activeImg]} 
 									alt={product.name} 
-									className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
+									style={{ width:'100%', height:'100%', objectFit:'contain', padding:20 }}
 								/>
-							) : (
-								<video 
-									src={media[active].src} 
-									className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
-									controls 
-									autoPlay 
-									muted 
-								/>
-							)
-						) : (
-							<div className="h-full w-full grid place-items-center text-accent">
-								<div className="text-center">
-									<svg className="w-16 h-16 mx-auto mb-4 text-accent" fill="currentColor" viewBox="0 0 24 24">
-										<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-									</svg>
-									<p className="text-lg font-medium">No media available</p>
-								</div>
+							</AnimatePresence>
+							
+							{/* Large Brand Watermark */}
+							<div style={{ position:'absolute', bottom:20, right:20, opacity:0.1, pointerEvents:'none' }}>
+								<div style={{ fontSize:40, fontWeight:900, color:STEEL, fontFamily:"'Playfair Display',serif" }}>SJHES</div>
+							</div>
+						</motion.div>
+
+						{/* Thumbnails */}
+						{images.length > 1 && (
+							<div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+								{images.map((img, idx) => (
+									<button 
+										key={idx}
+										onClick={() => setActiveImg(idx)}
+										style={{ 
+											width:80, height:80, borderRadius:12, overflow:'hidden', cursor:'pointer',
+											border: activeImg === idx ? `2px solid ${RED}` : '2px solid transparent',
+											padding:4, background:'#fff', transition:'all 0.2s',
+											boxShadow: activeImg === idx ? '0 4px 12px rgba(196,30,58,0.2)' : 'none'
+										}}
+									>
+										<img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', borderRadius:8 }} />
+									</button>
+								))}
 							</div>
 						)}
 					</div>
-					
-					{/* Thumbnail Gallery */}
-					{media.length > 1 && (
-						<div className="space-y-3">
-							<h3 className="font-sans font-semibold text-dark">Gallery</h3>
-							<div className="flex gap-3 overflow-x-auto pb-2">
-								{media.map((m, idx) => (
-									<div 
-										key={idx} 
-										className={`relative h-24 w-32 overflow-hidden rounded-xl border-2 transition-all hover:scale-105 flex-shrink-0 ${
-											idx === active 
-												? 'border-primary shadow-lg' 
-												: 'border-[--color-accent-light] hover:border-primary'
-										}`}
-									>
-										{m.type === 'image' ? (
-											<img 
-												src={m.src} 
-												className="h-full w-full object-cover cursor-pointer" 
-												onClick={() => {
-													console.log('Thumbnail clicked', { 
-														index: idx, 
-														mediaType: m.type,
-														wasActive: idx === active 
-													})
-													setActive(idx)
-													openModal(idx)
-												}}
-											/>
-										) : (
-											<video 
-												src={m.src} 
-												className="h-full w-full object-cover cursor-pointer" 
-												muted 
-												onClick={() => {
-													console.log('Thumbnail clicked', { 
-														index: idx, 
-														mediaType: m.type,
-														wasActive: idx === active 
-													})
-													setActive(idx)
-													openModal(idx)
-												}}
-											/>
-										)}
-										{idx === active && (
-											<div className="absolute inset-0 bg-primary/20 flex items-center justify-center pointer-events-none">
-												<svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
-													<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-												</svg>
-											</div>
-										)}
-									</div>
-								))}
-							</div>
-						</div>
-					)}
-				</div>
 
-				{/* Product Info Section */}
-				<div className="space-y-8">
-					<div className="card-engineering">
-						<div className="flex items-center gap-3 mb-6">
-							<svg className="gear-icon" fill="currentColor" viewBox="0 0 24 24">
-								<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-							</svg>
-							<h2 className="text-2xl font-display font-bold text-dark">Product Information</h2>
+					{/* ── Right: Product Content ────────────────────────────────────── */}
+					<motion.div initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.2 }}>
+						<div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#fde8ec', borderRadius:50, padding:'5px 16px', marginBottom:18 }}>
+							<span style={{ width:8, height:8, borderRadius:'50%', background:RED }} />
+							<span style={{ color:RED, fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'0.06em' }}>{t('product.premium')}</span>
 						</div>
-						
-						<h1 className="font-display font-bold text-4xl mb-8 text-dark">{product.name}</h1>
-						<div className="prose prose-xl max-w-none">
-							<p className="text-gray-800 leading-10 whitespace-pre-wrap font-sans text-lg">{product.details}</p>
-						</div>
-						
-						<div className="mt-8 pt-6 border-t-2 border-[--color-accent-light]">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-3">
-									<div className="w-3 h-3 bg-primary rounded-full"></div>
-									<span className="text-accent font-semibold text-lg">SRI JAI HARI Engineering Solution</span>
-								</div>
-								<Link 
-									to="/enquiry" 
-									className="btn text-lg px-6 py-3"
-								>
-									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-									</svg>
-									Get Quote
-								</Link>
+
+						<h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:'clamp(2.4rem,4vw,3.2rem)', fontWeight:900, color:'#111', lineHeight:1.1, marginBottom:16 }}>
+							{product.name}
+						</h1>
+
+						<div style={{ display:'flex', gap:16, marginBottom:32 }}>
+							<div style={{ display:'flex', alignItems:'center', gap:6 }}>
+								<div style={{ color:'gold', fontSize:18 }}>★★★★★</div>
+								<span style={{ fontSize:13, color:STEEL, fontWeight:600 }}>{t('product.trusted')}</span>
 							</div>
+							<div style={{ borderLeft:'1px solid #ddd', height:20 }} />
+							<div style={{ fontSize:13, color:CYAN, fontWeight:800, letterSpacing:'0.02em' }}>{t('product.delivery')}</div>
+						</div>
+
+						<div style={{ background:'#fcfcfc', border:'1.5px solid #f0f0f0', borderRadius:20, padding:'2rem', marginBottom:32 }}>
+							<h3 style={{ fontSize:14, fontWeight:800, color:'#111', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:14, display:'flex', alignItems:'center', gap:8 }}>
+								<svg width="18" height="18" fill="none" stroke={RED} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h7" /></svg>
+								{t('product.specs')}
+							</h3>
+							<p style={{ color:'#444', fontSize:16, lineHeight:1.8, whiteSpace:'pre-wrap' }}>
+								{product.details}
+							</p>
+						</div>
+
+						{/* Feature List */}
+						<div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:40 }}>
+							{[
+								{ t: t('product.category'), v: 'Industrial Spare Part' },
+								{ t: 'Model', v: product.model || 'none' },
+								{ t: t('product.deliveryLabel'), v: 'All Tamil Nadu' },
+								{ t: t('product.supportLabel'), v: '24/7 Assistance' },
+								{ t: t('product.warranty'), v: 'Manufacturer Warranty' }
+							].map(item => (
+								<div key={item.t} style={{ borderBottom:'1px solid #f0f0f0', paddingBottom:10 }}>
+									<div style={{ fontSize:11, color:STEEL, textTransform:'uppercase', fontWeight:700 }}>{item.t}</div>
+									<div style={{ fontSize:14, fontWeight:700, color:'#333' }}>{item.v}</div>
+								</div>
+							))}
+						</div>
+
+						{/* Inquiry Actions */}
+						<div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+							<button 
+								onClick={() => navigate('/enquiry')}
+								style={{ 
+									flex:1, minWidth:240, background:RED, color:'#fff', border:'none', borderRadius:14, 
+									padding:'18px 32px', fontWeight:800, fontSize:16, cursor:'pointer',
+									boxShadow:`0 10px 30px rgba(196,30,58,0.35)`, transition:'all 0.2s',
+									display:'flex', alignItems:'center', justifyContent:'center', gap:10
+								}}
+							>
+								{t('product.customQuote')}
+							</button>
+							<a 
+								href="tel:+919514111460"
+								style={{ 
+									background:'rgba(14,165,233,0.1)', color:CYAN, textDecoration:'none', borderRadius:14, 
+									padding:'18px 24px', fontWeight:800, border:`1.5px solid ${CYAN}`,
+									transition:'all 0.2s', display:'flex', alignItems:'center', gap:10
+								}}
+							>
+								<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+							</a>
+						</div>
+
+						<div style={{ marginTop:30, display:'flex', alignItems:'center', gap:10, color:STEEL, fontSize:12 }}>
+							<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+							SJH Genuine Safety Verified
+						</div>
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ── CTA Banner ─────────────────────────────────────────────────── */}
+			<div style={{ background:'#fcfcfc', borderTop:'1px solid #f0f0f0', padding:'5rem 0' }}>
+				<div className="container-page" style={{ textAlign:'center' }}>
+					<h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:32, marginBottom:12 }}>{t('product.bulkTitle')}</h2>
+					<p style={{ color:STEEL, marginBottom:30, fontSize:15 }}>{t('product.bulkSub')}</p>
+					<div style={{ height:2, width:60, background:RED, margin:'0 auto 30px' }} />
+					<div style={{ display:'flex', justifyContent:'center', gap:40, flexWrap:'wrap', color:'#111', fontWeight:800, fontSize:14, letterSpacing:'0.02em', textTransform:'uppercase' }}>
+						<div style={{ display:'flex', alignItems:'center', gap:10 }}>
+							<span style={{ width:12, height:12, background:CYAN, borderRadius:'50%', boxShadow:`0 0 10px ${CYAN}` }} />
+							{t('product.instant')}
+						</div>
+						<div style={{ display:'flex', alignItems:'center', gap:10 }}>
+							<span style={{ width:12, height:12, background:RED, borderRadius:'50%', boxShadow:`0 0 10px ${RED}` }} />
+							{t('product.allTN')}
 						</div>
 					</div>
 				</div>
 			</div>
-			
-			{/* Image Modal */}
-			<ImageModal
-				isOpen={isModalOpen}
-				onClose={closeModal}
-				images={media}
-				currentIndex={modalIndex}
-				onIndexChange={setModalIndex}
-			/>
 		</div>
 	)
 }

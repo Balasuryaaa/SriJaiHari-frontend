@@ -1,155 +1,167 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import useAuthStore from '../stores/authStore'
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
+import { useLanguage } from '../context/LanguageContext'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const RED   = '#C41E3A'
+const STEEL = '#8C8C8C'
 
 function Navbar() {
-	const navigate = useNavigate()
-	const { token, logout } = useAuthStore()
-	const [isDark, setIsDark] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const location = useLocation()
+  const { lang, setLang, t } = useLanguage()
 
-	useEffect(() => {
-		// Check for saved theme preference or default to light mode
-		const savedTheme = localStorage.getItem('theme')
-		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-		const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark)
-		
-		setIsDark(shouldBeDark)
-		if (shouldBeDark) {
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-		}
-	}, [])
+  const isActive = (path) => location.pathname === path
 
-	const toggleTheme = () => {
-		const newTheme = !isDark
-		setIsDark(newTheme)
-		if (newTheme) {
-			document.documentElement.classList.add('dark')
-			localStorage.setItem('theme', 'dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-			localStorage.setItem('theme', 'light')
-		}
-	}
+  const navLinks = [
+    { path: '/', label: t('nav.home') },
+    { path: '/enquiry', label: t('nav.enquiry') }
+  ]
 
-	return (
-		<header className="sticky top-0 z-40 navbar">
-			<div className="container-page flex h-20 items-center justify-between">
-				<Link to="/" className="flex items-center gap-4 group">
-					<div className="relative">
-						<img 
-							src={logo} 
-							alt="SRI JAI HARI ENGINEERING SOLUTION" 
-							className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
-						/>
-						<div className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse" style={{backgroundColor: 'var(--color-secondary)'}}></div>
-					</div>
-					<div className="hidden sm:block">
-						<div className="logo-text">
-							<span className="text-primary">SRI</span> <span className="text-dark dark:text-white">JAI HARI</span>
-						</div>
-						<div className="logo-subtitle">ENGINEERING SOLUTION</div>
-					</div>
-				</Link>
-				<nav className="flex items-center gap-6">
-					<NavLink 
-						to="/" 
-						className={({isActive}) => 
-							`font-sans font-medium px-3 py-2 rounded-lg transition-all duration-200 ${
-								isActive 
-									? 'text-primary shadow-md' 
-									: 'text-dark dark:text-white hover:text-primary dark:hover:bg-gray-700'
-							}`
-						}
-						style={({isActive}) => ({
-							backgroundColor: isActive 
-								? 'var(--color-primary-light)' 
-								: 'transparent',
-							'--tw-bg-opacity': isActive ? '1' : '0'
-						})}
-					>
-						Home
-					</NavLink>
-					<NavLink 
-						to="/enquiry" 
-						className={({isActive}) => 
-							`font-sans font-medium px-3 py-2 rounded-lg transition-all duration-200 ${
-								isActive 
-									? 'text-primary shadow-md' 
-									: 'text-dark dark:text-white hover:text-primary dark:hover:bg-gray-700'
-							}`
-						}
-						style={({isActive}) => ({
-							backgroundColor: isActive 
-								? 'var(--color-primary-light)' 
-								: 'transparent',
-							'--tw-bg-opacity': isActive ? '1' : '0'
-						})}
-					>
-						Enquiry
-					</NavLink>
-					
-					{/* Dark Mode Toggle */}
-					<button
-						onClick={toggleTheme}
-						className="p-2 rounded-lg hover-accent-light dark:hover:bg-gray-700 transition-colors"
-						aria-label="Toggle dark mode"
-					>
-						{isDark ? (
-							<svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-								<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
-							</svg>
-						) : (
-							<svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-								<path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 9 9 0 004.463-1.69a.75.75 0 01.162-.819 1.5 1.5 0 01.985-.44 1.5 1.5 0 011.5 1.5c0 .74-.402 1.38-1.001 1.73a.75.75 0 01-.162.819A8.97 8.97 0 0115 18a9 9 0 01-9-9 9 9 0 00-4.463 1.69.75.75 0 01-.162.819 1.5 1.5 0 01-.985.44 1.5 1.5 0 01-1.5-1.5c0-.74.402-1.38 1.001-1.73a.75.75 0 01.162-.819A8.97 8.97 0 009 6a8.97 8.97 0 00-4.463-1.69.75.75 0 01-.162-.819 1.5 1.5 0 01.985-.44 1.5 1.5 0 011.5 1.5c0 .74-.402 1.38-1.001 1.73z" clipRule="evenodd" />
-							</svg>
-						)}
-					</button>
-					
-					{token ? (
-						<>
-							<NavLink 
-								to="/admin" 
-								className={({isActive}) => 
-									`font-sans font-medium px-3 py-2 rounded-lg transition-all duration-200 ${
-										isActive 
-											? 'text-secondary shadow-md' 
-											: 'text-dark dark:text-white hover:text-secondary dark:hover:bg-gray-700'
-									}`
-								}
-								style={({isActive}) => ({
-									backgroundColor: isActive 
-										? 'var(--color-secondary-light)' 
-										: 'transparent',
-									'--tw-bg-opacity': isActive ? '1' : '0'
-								})}
-							>
-								Admin
-							</NavLink>
-							<button 
-								className="btn" 
-								onClick={() => { logout(); navigate('/') }}
-							>
-								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-								</svg>
-								Logout
-							</button>
-						</>
-					) : (
-						<Link to="/admin/login" className="btn-secondary">
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-							</svg>
-							Admin Login
-						</Link>
-					)}
-				</nav>
-			</div>
-		</header>
-	)
+  return (
+    <nav style={{
+      background: '#fff',
+      borderBottom: `2px solid ${RED}`,
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000,
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+    }}>
+      <div className="container-page" style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        
+        {/* Logo */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+          <img src={logo} alt="SRI JAI HARI" style={{ height: 48, width: 'auto' }} />
+          <div className="hidden-mobile">
+            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 18 }}>
+              <span style={{ color: RED }}>SRI JAI HARI</span>
+            </div>
+            <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: STEEL, marginTop: 1 }}>
+              Engineering Solution
+            </div>
+          </div>
+        </Link>
+
+        {/* Desktop Nav */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(1rem, 3vw, 2.5rem)' }} className="hidden-mobile">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.path}
+              to={link.path}
+              style={{
+                textDecoration: 'none',
+                fontSize: 14,
+                fontWeight: 700,
+                color: isActive(link.path) ? RED : '#333',
+                padding: '8px 16px',
+                borderRadius: 8,
+                background: isActive(link.path) ? '#fde8ec' : 'transparent',
+                transition: 'all 0.2s'
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          {/* Language Toggle */}
+          <div style={{ display:'flex', border:`1.5px solid #eee`, borderRadius:10, overflow:'hidden', background:'#f9f9f9' }}>
+            <button 
+              onClick={() => setLang('en')}
+              style={{ 
+                padding:'6px 14px', fontSize:11, fontWeight:800, cursor:'pointer', border:'none',
+                background: lang === 'en' ? RED : 'transparent',
+                color: lang === 'en' ? '#fff' : STEEL,
+                transition: 'all 0.2s'
+              }}
+            >
+              EN
+            </button>
+            <button 
+              onClick={() => setLang('ta')}
+              style={{ 
+                padding:'6px 14px', fontSize:11, fontWeight:800, cursor:'pointer', border:'none',
+                background: lang === 'ta' ? RED : 'transparent',
+                color: lang === 'ta' ? '#fff' : STEEL,
+                transition: 'all 0.2s'
+              }}
+            >
+              தமிழ்
+            </button>
+          </div>
+
+          <a href="tel:+919514111460" style={{
+            background: RED,
+            color: '#fff',
+            textDecoration: 'none',
+            padding: '11px 24px',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 800,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: `0 8px 24px rgba(196,30,58,0.3)`
+          }}>
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            {t('nav.callNow')}
+          </a>
+        </div>
+
+        {/* ── Animated Hamburger Icon ── */}
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className="visible-mobile"
+          style={{ background:'none', border:'none', cursor:'pointer', width:40, height:40, position:'relative', zIndex:1001 }}
+        >
+          <div style={{ width:24, height:2, background:RED, position:'absolute', top:isOpen?'20px':'14px', left:8, 
+            transform:isOpen?'rotate(45deg)':'none', transition:'0.3s' }} />
+          <div style={{ width:24, height:2, background:RED, position:'absolute', top:'20px', left:8, 
+            opacity:isOpen?0:1, transition:'0.2s' }} />
+          <div style={{ width:24, height:2, background:RED, position:'absolute', top:isOpen?'20px':'26px', left:8, 
+            transform:isOpen?'rotate(-45deg)':'none', transition:'0.3s' }} />
+        </button>
+      </div>
+
+      {/* ── Mobile Side Menu ── */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            style={{ 
+              position: 'fixed', top: 0, right: 0, bottom: 0, width: '280px', 
+              background: '#fff', zIndex: 1000, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
+              padding: '100px 30px 40px', display: 'flex', flexDirection: 'column', gap: 20
+            }}
+          >
+            {navLinks.map(link => (
+              <Link key={link.path} to={link.path} onClick={()=>setIsOpen(false)}
+                style={{ textDecoration:'none', color:'#111', fontSize:20, fontWeight:800, borderBottom:'1px solid #f0f0f0', paddingBottom:10 }}>
+                {link.label}
+              </Link>
+            ))}
+
+            <div style={{ marginTop:'auto', display:'flex', gap:10 }}>
+              <button onClick={()=>setLang('en')} style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${lang==='en'?RED:'#eee'}`, background:lang==='en'?RED:'#fff', color:lang==='en'?'#fff':'#333', fontWeight:800 }}>English</button>
+              <button onClick={()=>setLang('ta')} style={{ flex:1, padding:12, borderRadius:12, border:`1.5px solid ${lang==='ta'?RED:'#eee'}`, background:lang==='ta'?RED:'#fff', color:lang==='ta'?'#fff':'#333', fontWeight:800 }}>தமிழ்</button>
+            </div>
+
+            <a href="tel:+919514111460" style={{ background:RED, color:'#fff', textDecoration:'none', padding:16, borderRadius:14, textAlign:'center', fontWeight:800, fontSize:16 }}>
+              {t('nav.callNow')}
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Overlay */}
+      {isOpen && <div onClick={()=>setIsOpen(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.2)', backdropFilter:'blur(2px)', zIndex:999 }} />}
+    </nav>
+  )
 }
 
 export default Navbar

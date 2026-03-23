@@ -1,146 +1,182 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getProducts } from '../lib/api'
 import Loader from '../components/Loader'
 import { motion } from 'framer-motion'
+import { useLanguage } from '../context/LanguageContext'
+
+const RED   = '#C41E3A'
+const CYAN  = '#0EA5E9'
+const STEEL = '#8C8C8C'
 
 function Home() {
 	const [products, setProducts] = useState([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState('')
+	const [loading, setLoading]   = useState(true)
+	const [error, setError]       = useState(false)
 	const navigate = useNavigate()
+	const { t } = useLanguage()
 
 	useEffect(() => {
-		console.log('Home component mounted')
-		
 		getProducts()
-			.then((res) => {
-				console.log('Products loaded successfully', { 
-					productCount: res.data?.length || 0 
-				})
-				setProducts(res.data)
-			})
-			.catch((err) => {
-				console.error('Failed to load products', err)
-				setError('Failed to load products')
-			})
+			.then((res) => setProducts(res.data))
+			.catch(() => setError(true))
 			.finally(() => setLoading(false))
 	}, [])
 
-	const handleProductClick = (productId, productName) => {
-		console.log('Product card clicked', { 
-			productId, 
-			productName 
-		})
-		navigate(`/products/${productId}`)
-	}
-
 	if (loading) return <Loader />
-	if (error) return <div className="container-page">{error}</div>
 
 	return (
-		<div className="container-page">
-			{/* Hero Section */}
-			<div className="text-center mb-12 py-8">
-				<div className="flex justify-center mb-6">
-					<div className="relative">
-						<div className="w-20 h-20 bg-gradient-to-br from-[--color-primary] to-[--color-secondary] rounded-full flex items-center justify-center shadow-2xl">
-							<svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-								<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-							</svg>
-						</div>
-						<div className="absolute -top-2 -right-2 w-6 h-6 bg-[--color-secondary] rounded-full animate-pulse"></div>
-					</div>
-				</div>
-				<h1 className="font-display font-bold text-4xl md:text-5xl mb-4">
-					<span className="text-primary">SRI JAI HARI</span>
-				</h1>
-				<p className="text-xl text-accent font-sans font-medium mb-2">ENGINEERING SOLUTION</p>
-				<p className="text-gray-600 max-w-2xl mx-auto">
-					Discover our comprehensive range of engineering products and solutions designed to meet your industrial needs with precision and reliability.
-				</p>
-			</div>
+		<div style={{ background:'#fff' }}>
 
-			{/* Products Section */}
-			<div className="mb-8">
-				<div className="flex items-center gap-3 mb-6">
-					<svg className="gear-icon" fill="currentColor" viewBox="0 0 24 24">
-						{/* <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/> */}
-					</svg>
-					<h2 className="text-3xl font-display font-bold text-dark">Our Products</h2>
-				</div>
-			</div>
-
-			<motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
-				initial="hidden" animate="show"
-				variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-			>
-				{products.map((p) => (
-					<motion.div 
-						key={p._id || p.id}
-						variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-						whileHover={{ y: -8, scale: 1.02 }}
-						transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-						className="card-engineering group cursor-pointer"
-						onClick={() => handleProductClick(p._id || p.id, p.name)}
-					>
-						{/* Product Image */}
-						<div className="relative aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-[--color-secondary-light] to-[--color-primary-light] mb-4">
-							{p.images?.[0] ? (
-								<img 
-									src={p.images[0]} 
-									alt={p.name} 
-									className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" 
-								/>
-							) : (
-								<div className="h-full w-full grid place-items-center text-accent">
-									<div className="text-center">
-										<svg className="w-12 h-12 mx-auto mb-2 text-accent" fill="currentColor" viewBox="0 0 24 24">
-											<path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-										</svg>
-										<p className="text-sm font-medium">No image available</p>
-									</div>
-								</div>
-							)}
-							<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/20" />
-							
-							{/* Hover overlay with click indicator */}
-							<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-								<div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 text-white">
-									<span className="text-sm font-medium">View Details</span>
-									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-									</svg>
-								</div>
-							</div>
-						</div>
-
-						{/* Product Content */}
-						<div className="space-y-3">
-							<div className="group">
-								<h3 className="font-sans font-bold text-lg text-dark group-hover:text-primary transition-colors">
-									{p.name}
-								</h3>
-								<p className="text-sm text-gray-600 line-clamp-2 mt-2 leading-relaxed">
-									{p.details}
-								</p>
-							</div>
-							
-							<div className="flex items-center justify-between pt-2">
-								<div className="flex items-center gap-2">
-									<div className="w-2 h-2 bg-primary rounded-full"></div>
-									<span className="text-xs text-accent font-medium">Engineering Solution</span>
-								</div>
-								<svg className="w-4 h-4 text-accent group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-								</svg>
-							</div>
-						</div>
+			{/* ══════════════════════════════════════════
+			    HERO SECTION
+			══════════════════════════════════════════ */}
+			<div style={{
+				background: `linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 55%, #3a0d16 100%)`,
+				position: 'relative', overflow: 'hidden',
+				padding: 'clamp(3rem,8vw,6rem) 1rem clamp(3rem,7vw,5rem)',
+			}}>
+				<div className="container-page" style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+					{/* Live badge */}
+					<motion.div initial={{ opacity:0, y:-12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
+						style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(14,165,233,0.15)', border:'1px solid rgba(14,165,233,0.3)', borderRadius:50, padding:'6px 18px', marginBottom:28 }}>
+						<span style={{ width:8, height:8, borderRadius:'50%', background:'#22c55e', display:'inline-block' }} />
+						<span style={{ color:'rgba(255,255,255,0.85)', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' }}>{t('hero.trusted')}</span>
 					</motion.div>
-				))}
-			</motion.div>
-			
+
+					{/* Headline */}
+					<motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, delay:0.1 }}
+						style={{ fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:'clamp(2.4rem,6vw,4.2rem)', lineHeight:1.12, marginBottom:22, letterSpacing:'-0.01em' }}>
+						<span style={{ color:RED }}>SRI JAI HARI</span><br />
+						<span style={{ color:'#fff' }}>{t('hero.engineering')}</span>
+					</motion.h1>
+
+					{/* Sub-headline */}
+					<motion.p initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, delay:0.18 }}
+						style={{ color:'rgba(255,255,255,0.68)', fontSize:'clamp(0.95rem,2vw,1.12rem)', maxWidth:560, marginBottom:36, lineHeight:1.7 }}>
+						{t('hero.tagline')}
+					</motion.p>
+
+					{/* CTAs */}
+					<motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.6, delay:0.25 }}
+						style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap', marginBottom:56 }}>
+						<a href="#products" style={{ background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)`, transition:'all 0.2s' }}>
+							{t('hero.browse')}
+						</a>
+						<a href="/enquiry" style={{ background:'rgba(14,165,233,0.18)', color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 30px', fontWeight:700, fontSize:15, border:'1.5px solid rgba(14,165,233,0.5)', transition:'all 0.2s' }}>
+							{t('hero.getQuote')}
+						</a>
+					</motion.div>
+
+					{/* Stats */}
+					<motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.8, delay:0.4 }}
+						style={{ display:'flex', justifyContent:'center', gap:'clamp(1.5rem,4vw,4rem)', flexWrap:'wrap', paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.1)', width:'100%' }}>
+						{[ 
+							{v:'20+', l: t('hero.years')}, 
+							{v:'3', l: t('hero.categories')}, 
+							{v:'All TN', l: t('hero.coverage')}, 
+							{v:'24/7', l: t('hero.support')} 
+						].map(item => (
+							<div key={item.l} style={{ textAlign:'center' }}>
+								<div style={{ color:RED, fontWeight:900, fontSize:'clamp(1.5rem,3vw,2.2rem)', fontFamily:"'Playfair Display',serif" }}>{item.v}</div>
+								<div style={{ color:'rgba(255,255,255,0.5)', fontSize:12, fontWeight:500, marginTop:3, letterSpacing:'0.04em' }}>{item.l}</div>
+							</div>
+						))}
+					</motion.div>
+				</div>
+			</div>
+
+			{/* ══════════════════════════════════════════
+			    PRODUCTS SECTION
+			══════════════════════════════════════════ */}
+			<div id="products" className="container-page" style={{ padding:'4.5rem 1rem' }}>
+				{/* Section heading */}
+				<div style={{ textAlign:'center', marginBottom:'3rem' }}>
+					<div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'#fde8ec', borderRadius:50, padding:'4px 16px', marginBottom:14 }}>
+						<span style={{ color:RED, fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'0.08em' }}>{t('home.catalogue')}</span>
+					</div>
+					<h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:'clamp(1.9rem,4vw,3rem)', color:'#111', marginBottom:12 }}>
+						{t('home.engineeringProducts')}
+					</h2>
+					<p style={{ color:STEEL, maxWidth:500, margin:'0 auto', fontSize:15, lineHeight:1.65 }}>
+						{t('home.productsTagline')}
+					</p>
+				</div>
+
+				{products.length === 0 ? (
+					<div style={{ textAlign:'center', padding:'4rem 1rem', color:'#9ca3af' }}>
+						<p style={{ fontSize:16, fontWeight:700, color:'#374151', marginBottom:6 }}>{t('home.noProducts')}</p>
+						<p style={{ fontSize:13, color:STEEL }}>{t('home.noProductsSub')}</p>
+					</div>
+				) : (
+					<motion.div
+						initial="hidden" animate="show"
+						variants={{ hidden:{}, show:{ transition:{ staggerChildren:0.07 } } }}
+						style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(290px,1fr))', gap:'1.75rem' }}
+					>
+						{products.map((p) => (
+							<ProductCard key={p._id || p.id} p={p} onClick={() => navigate(`/products/${p._id || p.id}`)} />
+						))}
+					</motion.div>
+				)}
+
+				{/* ── CTA Banner ─────────────────────────────────────────────── */}
+				<motion.div
+					initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }}
+					viewport={{ once:true }} transition={{ duration:0.6 }}
+					style={{
+						marginTop:'4.5rem',
+						background:`linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #3a0d16 100%)`,
+						borderRadius:20, padding:'3.5rem 2rem', textAlign:'center',
+						position:'relative', overflow:'hidden',
+						border:`2px solid rgba(196,30,58,0.3)`,
+					}}
+				>
+					<div style={{ position:'relative' }}>
+						<h3 style={{ fontFamily:"'Playfair Display',serif", color:'#fff', fontWeight:900, fontSize:'clamp(1.5rem,3vw,2.4rem)', marginBottom:12 }}>
+							{t('home.bulkTitle')}
+						</h3>
+						<p style={{ color:'rgba(255,255,255,0.6)', marginBottom:30, fontSize:15, maxWidth:480, margin:'0 auto 30px' }}>
+							{t('home.bulkSub')}
+						</p>
+						<div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
+							<a href="/enquiry" style={{ display:'inline-flex', alignItems:'center', gap:8, background:RED, color:'#fff', textDecoration:'none', borderRadius:10, padding:'13px 28px', fontWeight:700, fontSize:15, boxShadow:`0 8px 24px rgba(196,30,58,0.4)` }}>
+								{t('home.sendEnquiry')}
+							</a>
+						</div>
+					</div>
+				</motion.div>
+			</div>
 		</div>
+	)
+}
+
+function ProductCard({ p, onClick }) {
+	const [hovered, setHovered] = useState(false)
+	return (
+		<motion.div
+			variants={{ hidden:{ opacity:0, y:24 }, show:{ opacity:1, y:0 } }}
+			onClick={onClick}
+			onMouseEnter={() => setHovered(true)}
+			onMouseLeave={() => setHovered(false)}
+			style={{
+				background:'#fff', borderRadius:16, overflow:'hidden', cursor:'pointer',
+				border: hovered ? `1.5px solid ${RED}` : '1.5px solid #e8e8e8',
+				boxShadow: hovered ? `0 16px 48px rgba(196,30,58,0.14)` : '0 4px 16px rgba(0,0,0,0.05)',
+				transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
+				transition: 'all 0.28s ease',
+			}}
+		>
+			<div style={{ aspectRatio:'16/10', overflow:'hidden', background:'linear-gradient(135deg, #f0f8ff, #fde8ec)' }}>
+				{p.images?.[0] && (
+					<img src={p.images[0]} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover', transform: hovered ? 'scale(1.07)' : 'scale(1)', transition:'transform 0.4s ease' }} />
+				)}
+			</div>
+			<div style={{ padding:'1.1rem 1.25rem 1.3rem' }}>
+				<h3 style={{ fontWeight:700, fontSize:15.5, color:'#111', marginBottom:6 }}>{p.name}</h3>
+				<p style={{ fontSize:13, color:'#6b6b6b', lineHeight:1.55, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{p.details}</p>
+			</div>
+		</motion.div>
 	)
 }
 
