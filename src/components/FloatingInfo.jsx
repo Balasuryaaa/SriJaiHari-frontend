@@ -14,7 +14,7 @@ function FloatingInfo() {
   return (
     <>
       {/* ── Separate High-Visibility Chat Button ── */}
-      <div style={{ position: 'fixed', right: 20, bottom: 100, zIndex: 9999 }}>
+      <div className="fixed right-5 bottom-24 md:bottom-[100px]" style={{ zIndex: 9999 }}>
         <AnimatePresence>
           {!isChatOpen && (
             <motion.button 
@@ -40,7 +40,7 @@ function FloatingInfo() {
               </motion.div>
               
               {/* Tooltip notice */}
-              <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden-mobile">
+              <div style={{ position:'absolute', right:75, background:'#111', color:'#fff', padding:'6px 12px', borderRadius:8, fontSize:10, fontWeight:700, whiteSpace:'nowrap', boxShadow:'0 10px 20px rgba(0,0,0,0.1)' }} className="hidden md:block">
                 Message Consultant
               </div>
             </motion.button>

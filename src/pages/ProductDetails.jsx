@@ -54,7 +54,7 @@ function ProductDetails() {
 				<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:'4rem', alignItems:'start' }}>
 					
 					{/* ── Left: Image Gallery ────────────────────────────────────────── */}
-					<div style={{ position:'sticky', top:100 }}>
+					<div className="lg:sticky lg:top-24">
 						<motion.div 
 							initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
 							style={{ 

@@ -90,13 +90,19 @@ export default function ChatWidget({ forcedOpen, onClose }) {
 
   if (!forcedOpen) return null
 
-  const isSmall = winWidth < 500
+  const isSmall = winWidth < 600
 
   return (
     <div style={{ 
-      position: 'fixed', right: isSmall ? 10 : 25, bottom: isSmall ? 85 : 100,
-      width: isSmall ? 'calc(100% - 20px)' : 380, height: isSmall ? 450 : 550,
-      background: '#fff', borderRadius: 24, boxShadow: '0 20px 80px rgba(0,0,0,0.25)',
+      position: 'fixed', 
+      right: isSmall ? 0 : 25, 
+      bottom: isSmall ? 0 : 100,
+      left: isSmall ? 0 : 'auto',
+      width: isSmall ? '100%' : 380, 
+      height: isSmall ? '80dvh' : 550,
+      background: '#fff', 
+      borderRadius: isSmall ? '24px 24px 0 0' : 24, 
+      boxShadow: '0 -10px 40px rgba(0,0,0,0.15)',
       display: 'flex', flexDirection: 'column', zIndex: 1000000, overflow: 'hidden',
       border: '1.5px solid #eee'
     }}>
