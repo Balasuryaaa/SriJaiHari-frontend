@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useAuthStore from '../../stores/authStore'
 
 const RED = '#C41E3A'
+const CYAN = '#0EA5E9'
 const STEEL = '#8C8C8C'
 
 function AdminDashboard() {

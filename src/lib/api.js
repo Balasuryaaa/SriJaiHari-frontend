@@ -1,9 +1,8 @@
 import axios from 'axios'
 import useAuthStore from '../stores/authStore'
 
-export const BASE_URL = import.meta.env.DEV
-  ? 'http://localhost:8070'
-  : 'https://sri-jai-hari-backend.vercel.app'
+export const BASE_URL = import.meta.env.VITE_API_URL 
+  || (import.meta.env.DEV ? 'http://localhost:8070' : 'https://sri-jai-hari-backend.vercel.app');
 
 const api = axios.create({ 
 	baseURL: BASE_URL,
