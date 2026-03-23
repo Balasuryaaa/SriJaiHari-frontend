@@ -39,7 +39,7 @@ function Navbar() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', maxWidth: '75%' }}>
           <img src={logo} alt="SRI JAI HARI" style={{ height: 'clamp(32px, 5vw, 44px)', width: 'auto' }} />
-          <div className="hidden-mobile">
+          <div className="hidden min-[600px]:block">
             <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 18 }}>
               <span style={{ color: RED }}>SRI JAI HARI</span>
             </div>
@@ -49,8 +49,8 @@ function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Nav Actions (Hidden on Mobile) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(1rem, 3vw, 2.5rem)' }} className="hidden-mobile">
+        {/* Desktop Nav Actions (Hidden on Mobile < 600px) */}
+        <div className="hidden min-[600px]:flex items-center" style={{ gap: 'clamp(1rem, 3vw, 2.5rem)' }}>
           {navLinks.map((link) => (
             <Link 
               key={link.path}
@@ -96,7 +96,7 @@ function Navbar() {
             </button>
           </div>
 
-          <a href="tel:+919514111460" className="hidden-mobile" style={{
+          <a href="tel:+919514111460" style={{
             background: RED,
             color: '#fff',
             textDecoration: 'none',
@@ -116,10 +116,10 @@ function Navbar() {
           </a>
         </div>
 
-        {/* ── Animated Hamburger Icon ── */}
+        {/* ── Animated Hamburger Icon (< 600px only) ── */}
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="visible-mobile"
+          className="flex min-[600px]:hidden items-center justify-center p-2 rounded-lg"
           style={{ background:'none', border:'none', cursor:'pointer', width:40, height:40, position:'relative', zIndex:1001 }}
         >
           <div style={{ width:24, height:2, background:RED, position:'absolute', top:isOpen?'20px':'14px', left:8, 
