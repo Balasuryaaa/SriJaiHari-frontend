@@ -8,9 +8,9 @@ const RED = '#C41E3A'
 const STEEL = '#8C8C8C'
 
 export default function AdminChatPanel() {
-  const [rooms, setRooms] = useState([])          // [{ _id (roomId), userName, lastMessage, timestamp }]
-  const [activeRoom, setActiveRoom] = useState(null)  // roomId string
-  const [activeHistory, setActiveHistory] = useState([]) // array of msg objects
+  const [rooms, setRooms] = useState([])          
+  const [activeRoom, setActiveRoom] = useState(null)  
+  const [activeHistory, setActiveHistory] = useState([]) 
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(true)
 
@@ -28,7 +28,8 @@ export default function AdminChatPanel() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await fetch(`${API_URL}/chat/rooms`)
+        // Cache busting guarantees real-time updates and bypasses Vercel/Chrome strict caching
+        const res = await fetch(`${API_URL}/chat/rooms?t=${Date.now()}`, { cache: 'no-store' })
         if (res.ok) {
           const data = await res.json()
           setRooms(data)
@@ -39,7 +40,7 @@ export default function AdminChatPanel() {
     }
     
     fetchRooms()
-    const interval = setInterval(fetchRooms, 3000)
+    const interval = setInterval(fetchRooms, 1500) // Much faster polling for seamless feel
     return () => clearInterval(interval)
   }, [])
 
@@ -49,7 +50,7 @@ export default function AdminChatPanel() {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${API_URL}/chat/history/${activeRoom}`)
+        const res = await fetch(`${API_URL}/chat/history/${activeRoom}?t=${Date.now()}`, { cache: 'no-store' })
         if (res.ok) {
           const data = await res.json()
           setActiveHistory(prev => data.length > prev.length ? data : prev)
@@ -60,7 +61,7 @@ export default function AdminChatPanel() {
     }
 
     fetchHistory()
-    const interval = setInterval(fetchHistory, 2000)
+    const interval = setInterval(fetchHistory, 1000) // Near real-time
     return () => clearInterval(interval)
   }, [activeRoom])
 
@@ -79,9 +80,10 @@ export default function AdminChatPanel() {
     const messageText = input.trim()
     setInput('')
 
-    // Optimistic Update
+    // Optimistic Update directly to history ensures instant visual feedback
     const optimisticMsg = { text: messageText, sender: 'admin', timestamp: new Date().toISOString() }
     setActiveHistory(prev => [...prev, optimisticMsg])
+    setTimeout(scrollToBottom, 50)
 
     try {
       await fetch(`${API_URL}/chat/message`, {
@@ -136,8 +138,8 @@ export default function AdminChatPanel() {
                     {room.userName?.[0] || 'G'}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:'#111', display:'flex', justifyContent:'space-between' }}>
-                      {room.userName}
+                    <div style={{ fontSize:14, fontWeight:700, color:'#111', display:'flex', justifyContent:'space-between', marginBottom:2 }}>
+                      <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:'100%' }}>{room.userName}</span>
                     </div>
                     {room.lastMessage && <div style={{ fontSize:11, color:STEEL, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{room.lastMessage}</div>}
                   </div>
@@ -158,7 +160,7 @@ export default function AdminChatPanel() {
           </div>
         ) : (
           <>
-            <div style={{ padding:'18px 24px', borderBottom:'1.5px solid #f5f5f5', display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ padding:'18px 24px', borderBottom:'1.5px solid #f5f5f5', display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
               <div style={{ width:42, height:42, borderRadius:'50%', background:RED, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800 }}>{activeRoomMeta?.userName?.[0] || 'C'}</div>
               <div>
                 <div style={{ fontWeight:800, fontSize:16 }}>{activeRoomMeta?.userName || 'Customer'}</div>
@@ -167,6 +169,9 @@ export default function AdminChatPanel() {
             </div>
 
             <div style={{ flex:1, overflowY:'auto', padding:'24px', background:'#fcfcfc', display:'flex', flexDirection:'column', gap:12 }}>
+              {activeHistory.length === 0 && (
+                <div style={{ textAlign:'center', color:'#aaa', fontSize:12, marginTop:40 }}>Loading chat history...</div>
+              )}
               {activeHistory.map((m, i) => (
                 <div key={m._id || i} style={{ alignSelf: m.sender === 'admin' ? 'flex-end' : 'flex-start', maxWidth:'75%' }}>
                   <div style={{ 
@@ -174,7 +179,8 @@ export default function AdminChatPanel() {
                     background: m.sender === 'admin' ? RED : '#fff',
                     color: m.sender === 'admin' ? '#fff' : '#111',
                     border: m.sender === 'admin' ? 'none' : '1px solid #eee',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                    wordBreak: 'break-word'
                   }}>
                     {m.text}
                   </div>
@@ -186,7 +192,7 @@ export default function AdminChatPanel() {
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} style={{ padding:'20px 24px', borderTop:'1.5px solid #f5f5f5', display:'flex', gap:12 }}>
+            <form onSubmit={sendMessage} style={{ padding:'20px 24px', borderTop:'1.5px solid #f5f5f5', display:'flex', gap:12, flexShrink:0 }}>
               <input 
                 autoFocus value={input} onChange={e => setInput(e.target.value)}
                 placeholder={`Type a message to ${activeRoomMeta?.userName || 'Customer'}...`}

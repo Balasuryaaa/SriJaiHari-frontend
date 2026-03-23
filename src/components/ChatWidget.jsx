@@ -34,7 +34,7 @@ export default function ChatWidget({ forcedOpen, onClose }) {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${API_URL}/chat/history/${getRoomId()}`);
+        const res = await fetch(`${API_URL}/chat/history/${getRoomId()}?t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           // Only update if history length changed to avoid jitter
@@ -46,7 +46,7 @@ export default function ChatWidget({ forcedOpen, onClose }) {
     };
 
     fetchHistory();
-    const interval = setInterval(fetchHistory, 3000); // Poll every 3s
+    const interval = setInterval(fetchHistory, 1500); // Super-fast 1.5s poll for instant feedback
     return () => clearInterval(interval);
   }, [nameSubmitted])
 
@@ -68,7 +68,7 @@ export default function ChatWidget({ forcedOpen, onClose }) {
     const messageText = input.trim();
     setInput('');
 
-    // Optimistic UI Update
+    // Optimistic UI Update guarantees zero input latency
     const optimisticMsg = { text: messageText, sender: 'user' };
     setMessages(prev => [...prev, optimisticMsg]);
 
