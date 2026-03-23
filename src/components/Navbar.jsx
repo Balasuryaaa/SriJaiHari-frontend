@@ -39,11 +39,11 @@ function Navbar() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', maxWidth: '75%' }}>
           <img src={logo} alt="SRI JAI HARI" style={{ height: 'clamp(32px, 5vw, 44px)', width: 'auto' }} />
-          <div className="hidden min-[600px]:block">
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 18 }}>
+          <div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 18, whiteSpace: 'nowrap' }}>
               <span style={{ color: RED }}>SRI JAI HARI</span>
             </div>
-            <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: STEEL, marginTop: 1 }}>
+            <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: STEEL, marginTop: 1, whiteSpace: 'nowrap' }}>
               Engineering Solution
             </div>
           </div>

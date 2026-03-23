@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { io } from 'socket.io-client'
+import { useState, useEffect, useRef } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 import { BASE_URL } from '../lib/api'
 
-// Clean the Base URL to avoid double-slash issues in Socket.io
-const SOCKET_URL = BASE_URL.replace(/\/$/, '');
+// Avoid trailing slashes for clean API calls
+const API_URL = BASE_URL.replace(/\/$/, '')
 
 function getRoomId() {
   let id = localStorage.getItem('chat_room_id') || 'user_' + Math.random().toString(36).slice(2) + '_' + Date.now()
@@ -16,11 +15,10 @@ export default function ChatWidget({ forcedOpen, onClose }) {
   const { t } = useLanguage()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
-  const [connected, setConnected] = useState(false)
+  const [connected, setConnected] = useState(true) // Always connected via HTTP
   const [nameSubmitted, setNameSubmitted] = useState(!!localStorage.getItem('chat_user_name'))
   const [nameInput, setNameInput] = useState(localStorage.getItem('chat_user_name') || '')
   
-  const socketRef = useRef(null)
   const messagesEndRef = useRef(null)
   const [winWidth, setWinWidth] = useState(window.innerWidth)
 
@@ -30,33 +28,26 @@ export default function ChatWidget({ forcedOpen, onClose }) {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // HTTP Long Polling for Chat Messages
   useEffect(() => {
     if (!nameSubmitted) return
-    
-    console.log('🔌 SOCKET: Attempting connection to', SOCKET_URL);
-    const socket = io(SOCKET_URL, { 
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5,
-      timeout: 10000
-    })
-    
-    socketRef.current = socket
-    
-    socket.on('connect', () => {
-      console.log('✅ SOCKET: Connected! ID:', socket.id);
-      setConnected(true)
-      socket.emit('user:join', { roomId: getRoomId(), userName: localStorage.getItem('chat_user_name') })
-    })
-    
-    socket.on('connect_error', (err) => {
-      console.error('❌ SOCKET ERROR:', err.message);
-    });
 
-    socket.on('disconnect', () => setConnected(false))
-    socket.on('chat:history', (hist) => setMessages(hist))
-    socket.on('chat:message', (m) => setMessages(prev => [...prev, m]))
-    
-    return () => socket.disconnect()
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch(`${API_URL}/chat/history/${getRoomId()}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Only update if history length changed to avoid jitter
+          setMessages(prev => data.length > prev.length ? data : prev);
+        }
+      } catch (err) {
+        console.error('Chat API Error:', err.message);
+      }
+    };
+
+    fetchHistory();
+    const interval = setInterval(fetchHistory, 3000); // Poll every 3s
+    return () => clearInterval(interval);
   }, [nameSubmitted])
 
   useEffect(() => {
@@ -70,11 +61,31 @@ export default function ChatWidget({ forcedOpen, onClose }) {
     setNameSubmitted(true)
   }
 
-  const sendMessage = (e) => {
+  const sendMessage = async (e) => {
     e.preventDefault()
     if (!input.trim()) return
-    socketRef.current?.emit('user:message', { roomId: getRoomId(), text: input.trim() })
-    setInput('')
+
+    const messageText = input.trim();
+    setInput('');
+
+    // Optimistic UI Update
+    const optimisticMsg = { text: messageText, sender: 'user' };
+    setMessages(prev => [...prev, optimisticMsg]);
+
+    try {
+      await fetch(`${API_URL}/chat/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: getRoomId(),
+          text: messageText,
+          sender: 'user',
+          userName: localStorage.getItem('chat_user_name')
+        })
+      });
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
   }
 
   if (!forcedOpen) return null

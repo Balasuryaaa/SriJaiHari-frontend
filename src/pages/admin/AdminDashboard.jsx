@@ -13,6 +13,7 @@ const STEEL = '#8C8C8C'
 
 function AdminDashboard() {
 	const [products, setProducts] = useState([])
+	const [enquiries, setEnquiries] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [creating, setCreating] = useState(false)
 	
@@ -26,12 +27,21 @@ function AdminDashboard() {
 	// Editing State
 	const [editingProduct, setEditingProduct] = useState(null)
 
-	const load = () => {
+	const load = async () => {
 		setLoading(true)
-		getProducts()
-			.then((res) => setProducts(res.data))
-			.catch(() => toast.error('Failed to load products'))
-			.finally(() => setLoading(false))
+		try {
+			const prodRes = await getProducts()
+			setProducts(prodRes.data)
+			
+			// Also fetch enquiries for accurate count
+			const { getEnquiries } = await import('../../lib/api')
+			const enqRes = await getEnquiries()
+			setEnquiries(enqRes.data || [])
+		} catch (error) {
+			toast.error('Failed to load data')
+		} finally {
+			setLoading(false)
+		}
 	}
 
   const onLogout = () => {
@@ -119,7 +129,7 @@ function AdminDashboard() {
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
             <Link to="/admin/enquiries" style={{ textDecoration: 'none', background: '#fff', color: '#111', padding: '10px 20px', borderRadius: 12, fontSize: 14, fontWeight: 700, border: '1.5px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
-              Enquiries ({products.length > 5 ? '5+' : products.length})
+              Enquiries ({enquiries.length > 99 ? '99+' : enquiries.length})
             </Link>
             <button onClick={load} style={{ background: RED, color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: `0 8px 20px rgba(196,30,58,0.2)` }}>
               Refresh Data
