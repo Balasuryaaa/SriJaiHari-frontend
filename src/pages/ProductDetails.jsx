@@ -54,7 +54,7 @@ function ProductDetails() {
 				<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:'4rem', alignItems:'start' }}>
 					
 					{/* ── Left: Image Gallery ────────────────────────────────────────── */}
-					<div className="lg:sticky lg:top-24">
+					<div className="sticky top-20 lg:top-24" style={{ zIndex: 1 }}>
 						<motion.div 
 							initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
 							style={{ 
@@ -104,7 +104,10 @@ function ProductDetails() {
 					</div>
 
 					{/* ── Right: Product Content ────────────────────────────────────── */}
-					<motion.div initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.2 }}>
+					<motion.div 
+						className="relative z-10 bg-white pb-8 max-lg:px-6 max-lg:pt-10 max-lg:-mx-4 max-lg:mt-4 max-lg:rounded-t-3xl max-lg:shadow-[0_-20px_50px_rgba(0,0,0,0.1)] lg:bg-transparent lg:shadow-none lg:m-0 lg:p-0"
+						initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.2 }}
+					>
 						<div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#fde8ec', borderRadius:50, padding:'5px 16px', marginBottom:18 }}>
 							<span style={{ width:8, height:8, borderRadius:'50%', background:RED }} />
 							<span style={{ color:RED, fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'0.06em' }}>{t('product.premium')}</span>
