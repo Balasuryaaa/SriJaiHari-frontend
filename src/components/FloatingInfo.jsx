@@ -41,7 +41,7 @@ function FloatingInfo() {
                 </svg>
               </motion.a>
 
-              {/* Chat Option */}
+               {/* Chat Option */}
               <motion.button 
                 onClick={toggleChat}
                 initial={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -49,13 +49,14 @@ function FloatingInfo() {
                 exit={{ opacity: 0, scale: 0.5, y: 20 }}
                 transition={{ delay: 0.05 }}
                 style={{
-                  width: 50, height: 50, borderRadius: '50%', background: '#fff', border: `2px solid #333`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                  cursor: 'pointer', color: '#333'
+                  height: 50, borderRadius: 25, background: '#fff', border: `2.5px solid ${CYAN}`,
+                  display: 'flex', alignItems: 'center', gap: 10, padding: '0 20px',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.12)', cursor: 'pointer', color: CYAN,
+                  fontWeight: 900, whiteSpace: 'nowrap'
                 }}
-                title="Live Chat"
               >
-                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <div style={{ fontSize: 13 }}>Message SJH Consultant</div>
+                <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
                 </svg>
               </motion.button>

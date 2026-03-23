@@ -73,7 +73,6 @@ function Home() {
 						style={{ display:'flex', justifyContent:'center', gap:'clamp(1.5rem,4vw,4rem)', flexWrap:'wrap', paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.1)', width:'100%' }}>
 						{[ 
 							{v:'20+', l: t('hero.years')}, 
-							{v:'3', l: t('hero.categories')}, 
 							{v:'All TN', l: t('hero.coverage')}, 
 							{v:'24/7', l: t('hero.support')} 
 						].map(item => (

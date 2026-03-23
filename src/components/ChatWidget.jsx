@@ -4,12 +4,16 @@ import { useLanguage } from '../context/LanguageContext'
 import { BASE_URL } from '../lib/api'
 
 function getRoomId() {
-  let id = sessionStorage.getItem('chat_room_id')
+  let id = localStorage.getItem('chat_room_id')
   if (!id) {
     id = 'user_' + Math.random().toString(36).slice(2) + '_' + Date.now()
-    sessionStorage.setItem('chat_room_id', id)
+    localStorage.setItem('chat_room_id', id)
   }
   return id
+}
+
+function getStoredName() {
+  return localStorage.getItem('chat_user_name') || ''
 }
 
 export default function ChatWidget({ forcedOpen, onClose }) {
@@ -17,8 +21,8 @@ export default function ChatWidget({ forcedOpen, onClose }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
-  const [userName, setUserName] = useState(sessionStorage.getItem('chat_user_name') || '')
-  const [nameSubmitted, setNameSubmitted] = useState(!!sessionStorage.getItem('chat_user_name'))
+  const [userName, setUserName] = useState(getStoredName())
+  const [nameSubmitted, setNameSubmitted] = useState(!!getStoredName())
   const [nameInput, setNameInput] = useState('')
 
   const socketRef = useRef(null)
@@ -72,9 +76,8 @@ export default function ChatWidget({ forcedOpen, onClose }) {
   const handleNameSubmit = (e) => {
     e.preventDefault()
     if (!nameInput.trim()) return
-    const name = nameInput.trim()
-    sessionStorage.setItem('chat_user_name', name)
-    setUserName(name)
+    setUserName(nameInput)
+    localStorage.setItem('chat_user_name', nameInput)
     setNameSubmitted(true)
   }
 
@@ -95,10 +98,13 @@ export default function ChatWidget({ forcedOpen, onClose }) {
     }}>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ fontWeight: 800, fontSize: 13 }}>{t('chat.title')}</div>
-          <div style={{ fontSize: 10, opacity: 0.7 }}>{connected ? `🟢 ${t('chat.online')}` : `🔴 ${t('chat.connecting')}`}</div>
-        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#22c55e' : '#ff4b2b' }} />
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 13 }}>SJH Engineering Solution</div>
+              <div style={{ fontSize: 10, opacity: 0.8, fontWeight: 700 }}>Consultant Messaging Service</div>
+            </div>
+          </div>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
